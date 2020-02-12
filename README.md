@@ -1,4 +1,5 @@
 # pybind_he
+Repo to try out using pybind11 to wrap parts of a c++ library.
 
 Requirements: Install HElib, and place helib_pack in the project lib/ directory.
 pybind11 installed.
