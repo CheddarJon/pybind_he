@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
   /*---------------------------- END OF GENERIC BGV CODE ------------------------- */
 
   // Matrix dimensions rows x cols
-  const long rows = 10;
-  const long cols = 10;
+  const long rows = 48;
+  const long cols = 24;
   // Chooses the columns in the matrix to acc.
   std::vector<long> selector(nslots);
   // Matrix repr, an array of vectors. Vectors has to have nslots elements.
