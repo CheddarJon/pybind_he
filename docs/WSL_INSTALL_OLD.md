@@ -26,6 +26,6 @@
             $ sudo make install
          ```
 
-(Branches on Slack)
-(Branches on Slack 2)
+(THIS FILE IS JUST FOR SAFEKEEPING - COULD BE REMOVED IN THE FUTURE)
+
          
