@@ -12,5 +12,9 @@ To build run: python setup.py build
 
 Copy .so file from build directory into lib/
 
-### For installing HElib under WSL:
-[LINK](docs/WSL_INSTALL_NEW.md) 
+### For installing HElib & Pybind under WSL:
+[HElib](docs/WSL_INSTALL_NEW.md) 
+
+[Pybind](docs/WSL_INSTALL_PYBIND.md) 
+
+###  

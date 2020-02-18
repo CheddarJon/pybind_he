@@ -1,3 +1,6 @@
 [submodule "submodules/HElib"]
 	path = submodules/HElib
 	url = https://github.com/homenc/HElib.git
+[submodule "submodules/Pybind"]
+	path = submodules/Pybind
+	url = https://github.com/pybind/pybind11.git

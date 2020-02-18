@@ -1,0 +1,12 @@
+# GIT WILL IGNORE THESE FILES
+
+lib/helib_pack/
+
+# When build, the submodules internal content will be modified
+submodules/HElib
+submodules/Pybind
+
+
+# Python stuff
+*.egg-info
+*~
