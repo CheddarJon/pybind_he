@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
 
   // Plaintext prime modulus
   unsigned long p = 4999;
-  // Cyclotomic polynomial - defines phi(m)
-  unsigned long m = 32109;
+  // Cyclotomic polynomial - defines phi(m) m = 321090 => 96 slots, m = 32109 => 24 slots.
+  unsigned long m = 321090;
   // Hensel lifting (default = 1)
   unsigned long r = 1;
   // Number of bits of the modulus chain
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
   /*---------------------------- END OF GENERIC BGV CODE ------------------------- */
 
   // Matrix dimensions rows x cols
-  const long rows = 48;
-  const long cols = 24;
+  const long rows = 96;
+  const long cols = 96;
   // Chooses the columns in the matrix to acc.
   std::vector<long> selector(nslots);
   // Matrix repr, an array of vectors. Vectors has to have nslots elements.
@@ -78,17 +78,16 @@ int main(int argc, char *argv[]) {
   // Encrypted matrix consists of a vector with as many Ctxt's as there are rows.
   std::vector<Ctxt> edb(rows, scratch);
 
-  // Choose columns.
-  selector[0] = 1;
-  selector[3] = 1;
-  selector[9] = 1;
-
   // Initialize plaintext matrix.
   for (long i = 0; i < rows; i++) {
     db[i] = std::vector<long>(nslots);
     for (long j = 0; j < cols; j++) {
         db[i][j] = j + 1;
     }
+
+    // Choose columns
+    if (i % 13 == 0)
+        selector[i] = 1;
   }
 
   Ctxt cselect(public_key);
