@@ -11,3 +11,6 @@ export LD_LIBRARY_PATH=/path/to/this/repo/lib/helib_pack/lib
 To build run: python setup.py build
 
 Copy .so file from build directory into lib/
+
+### For installing HElib under WSL:
+[LINK](docs/WSL_INSTALL_NEW.md) 
