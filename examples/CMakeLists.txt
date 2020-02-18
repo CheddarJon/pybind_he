@@ -7,12 +7,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 ## Require full C++ standard
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(bgv_matrix_op
+project(helib_test
        	LANGUAGES CXX)
 
 find_package(helib 1.0.0 EXACT REQUIRED)
 
-add_executable(bgv_matrix_op bgv_matrix_op.cpp)
+set(SOURCES bgv_matrix_op.cpp BGV_general_example.cpp binaryArith_example.cpp)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${helib_test_SOURCE_DIR}/bin)
 
-target_link_libraries(bgv_matrix_op helib)
-
+foreach(f ${SOURCES})
+    STRING(REPLACE ".cpp" "" fn ${f})
+    add_executable(${fn} ${f})
+    target_link_libraries(${fn} helib)
+endforeach(f ${SOURCES})
