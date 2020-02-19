@@ -13,8 +13,10 @@ To build run: python setup.py build
 Copy .so file from build directory into lib/
 
 ### For installing HElib & Pybind under WSL:
-[HElib](docs/WSL_INSTALL_NEW.md) 
+[HElib](docs/WSL_INSTALL_HELIB.md) 
 
 [Pybind](docs/WSL_INSTALL_PYBIND.md) 
 
-###  
+###  For sanity check:
+
+[SANITY](docs/SANITY_CHECK.md) 

@@ -10,3 +10,7 @@ submodules/Pybind
 # Python stuff
 *.egg-info
 *~
+
+# Examples
+examples/bin
+examples/build
