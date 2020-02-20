@@ -15,6 +15,11 @@
 #include <helib/binaryArith.h>
 #include <helib/intraSlot.h>
 
+void sub_module(helib::CtPtrs& res, std::vector<helib::Ctxt> a,
+        std::vector<helib::Ctxt> b, std::vector<helib::Ctxt> enc_1, helib::Ctxt scratch,
+        const long bitSize, std::vector<helib::zzX> unpackSlotEncoding);
+void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
+
 int main(int argc, char* argv[])
 {
   /*  Example of binary arithmetic using the BGV scheme  */
@@ -104,27 +109,31 @@ int main(int argc, char* argv[])
   // which would result in several parallel slot-wise operations.
   // For simplicity we place the same data into each slot of each ciphertext,
   // printing out only the back of each vector.
-  long bitSize = 16;
+  const long bitSize = 16;
   long outSize = 2 * bitSize;
   long a_data = 0b0000000111111111;
-  long b_data = 0b0000000111111111;
+  long b_data = 0b0000000011111111;
   long c_data = 0b1111111111111111;
+  long d_data = 0b0000000000000001;
 
   std::cout << "Pre-encryption data:" << std::endl;
   std::cout << "a = " << a_data << std::endl;
   std::cout << "b = " << b_data << std::endl;
   std::cout << "c = " << c_data << std::endl;
+  std::cout << "d = " << d_data << std::endl;
 
   // Use a scratch ciphertext to populate vectors.
   helib::Ctxt scratch(public_key);
   std::vector<helib::Ctxt> encrypted_a(bitSize, scratch);
   std::vector<helib::Ctxt> encrypted_b(bitSize, scratch);
   std::vector<helib::Ctxt> encrypted_c(bitSize, scratch);
+  std::vector<helib::Ctxt> encrypted_d(bitSize, scratch);
   // Encrypt the data in binary representation.
   for (long i = 0; i < bitSize; ++i) {
     std::vector<long> a_vec(ea.size());
     std::vector<long> b_vec(ea.size());
     std::vector<long> c_vec(ea.size());
+    std::vector<long> d_vec(ea.size());
     // Extract the i'th bit of a,b,c.
     for (auto& slot : a_vec)
       slot = (a_data >> i) & 1;
@@ -132,9 +141,12 @@ int main(int argc, char* argv[])
       slot = (b_data >> i) & 1;
     for (auto& slot : c_vec)
       slot = (c_data >> i) & 1;
+    for (auto& slot : d_vec)
+      slot = (d_data >> i) & 1;
     ea.encrypt(encrypted_a[i], public_key, a_vec);
     ea.encrypt(encrypted_b[i], public_key, b_vec);
     ea.encrypt(encrypted_c[i], public_key, c_vec);
+    ea.encrypt(encrypted_d[i], public_key, d_vec);
   }
 
   // Although in general binary numbers are represented here as
@@ -150,53 +162,34 @@ int main(int argc, char* argv[])
 
   // Perform the subtraction first and put it in encrypted_product.
   // TODO extract block to a subtract Module.
-  std::vector<helib::Ctxt> encrypted_diff;
-  helib::CtPtrs_vectorCt diff_wrapper(encrypted_diff);
+  /*std::vector<helib::Ctxt> res;
+  helib::CtPtrs_vectorCt wres(res);
   helib::addTwoNumbers(
-      diff_wrapper,
-      helib::CtPtrs_vectorCt(encrypted_a),
-      helib::CtPtrs_vectorCt(encrypted_b),
-      true, // is b negative?
-      &unpackSlotEncoding); // Information needed for bootstrapping.
+          wres,
+          helib::CtPtrs_vectorCt(encrypted_b),
+          helib::CtPtrs_vectorCt(encrypted_c),
+          bitSize,
+          &unpackSlotEncoding);
+  */
+  std::vector<helib::Ctxt> diff;
+  helib::CtPtrs_vectorCt wdiff(diff);
+  sub_module(
+          wdiff,
+          encrypted_a,
+          encrypted_b,
+          encrypted_d,
+          scratch,
+          bitSize,
+          unpackSlotEncoding);
 
   std::vector<long> decrypted_result;
-  helib::decryptBinaryNums(decrypted_result, diff_wrapper, secret_key, ea);
+  helib::decryptBinaryNums(decrypted_result, wdiff, secret_key, ea);
   std::cout << "a-b = " << decrypted_result.back() << std::endl;
 
-  // Now perform the encrypted sum and put it in encrypted_result.
-  // TODO extract block to a Bit - inversion Module.
-  std::vector<helib::Ctxt> encrypted_inv;
-  helib::CtPtrs_vectorCt inv_wrapper(encrypted_inv);
-  helib::addTwoNumbers(
-      inv_wrapper,
-      diff_wrapper,
-      helib::CtPtrs_vectorCt(encrypted_c),
-      false,
-      &unpackSlotEncoding);
-
+  inv_module(diff, bitSize);
   decrypted_result.clear();
-  helib::decryptBinaryNums(decrypted_result, inv_wrapper, secret_key, ea);
-  std::cout << "(a-b)+Enc(1) = " << decrypted_result.back() << std::endl;
-
-    // Decrypt and print the result.
-  // TODO Add Bit multiplication Module. possibly using Ctxt instead of vector.
-  /*std::vector<helib::Ctxt> wrap_scratch(1, scratch);
-  std::vector<helib::CtPtrs_vectorCt> enc_bits(bitSize, wrap_scratch);
-  for (long i = 0; i < bitSize; i++)
-      enc_bits[i] = std::vector<helib::Ctxt>(1, encrypted_inv[i]);
-
-  std::vector<helib::Ctxt> encrypted_prod;
-  helib::CtPtrs_vectorCt prod_wrapper(encrypted_prod);
-  for (long i = 0; i < bitSize - 1; i++) {
-      helib::multTwoNumbers(
-              prod_wrapper,
-              enc_bits[i],
-              enc_bits[i + 1],
-              1,
-              &unpackSlotEncoding);
-  }*/
-
-
+  helib::decryptBinaryNums(decrypted_result, helib::CtPtrs_vectorCt(diff), secret_key, ea);
+  std::cout << "inv(a-b) = " << decrypted_result.back() << std::endl;
 
   // Now calculate the sum of a, b and c using the addManyNumbers function.
   /*
@@ -230,4 +223,45 @@ int main(int argc, char* argv[])
   std::cout << "popcnt(a) = " << decrypted_result.back() << std::endl;
 */
   return 0;
+}
+
+void
+sub_module(helib::CtPtrs& res, std::vector<helib::Ctxt> a,
+        std::vector<helib::Ctxt> b, std::vector<helib::Ctxt> enc_1, helib::Ctxt scratch,
+        const long bitSize, std::vector<helib::zzX> unpackSlotEncoding)
+{
+
+    std::vector<helib::Ctxt> b_comp1(bitSize, scratch);
+    helib::vecCopy(b_comp1, b);
+
+    inv_module(b_comp1, bitSize);
+
+    std::vector<helib::Ctxt> b_comp2;
+    helib::CtPtrs_vectorCt wb_comp2(b_comp2);
+    helib::addTwoNumbers(
+          wb_comp2,
+          helib::CtPtrs_vectorCt(b_comp1),
+          helib::CtPtrs_vectorCt(enc_1),
+          bitSize,
+          &unpackSlotEncoding);
+
+    helib::addTwoNumbers(
+          res,
+          helib::CtPtrs_vectorCt(a),
+          wb_comp2,
+          bitSize,
+          &unpackSlotEncoding);
+}
+
+void
+inv_module(std::vector<helib::Ctxt>& v, const long bitSize)
+{
+    long all1 = 0;
+    for (int i = 0; i < bitSize; i++) {
+        all1 <<= 1;
+        all1 |= 1;
+    }
+
+    for (auto& slot : v)
+        slot.xorConstant(NTL::ZZX(all1));
 }
