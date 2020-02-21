@@ -12,7 +12,7 @@ project(helib_test
 
 find_package(helib 1.0.0 EXACT REQUIRED)
 
-set(SOURCES bgv_matrix_op.cpp BGV_general_example.cpp binaryArith_example.cpp)
+set(SOURCES bgv_matrix_op.cpp BGV_general_example.cpp bgv_search.cpp)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${helib_test_SOURCE_DIR}/bin)
 
 foreach(f ${SOURCES})

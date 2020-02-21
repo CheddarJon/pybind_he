@@ -24,8 +24,6 @@
     #define ENTRIES 20
 #endif
 
-
-
 void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
 void inv_module(helib::Ctxt& c, const long bitSize);
 long gen1s(const long bitSize);
@@ -52,7 +50,7 @@ int main(int argc, char* argv[])
   long bits = 500;
   // Number of columns of Key-Switching matrix (typically 2 or 3).
   long c = 2;
-  // Factorisation of m required for bootstrapping.
+  // Factorisation of m required for bootstrapping. m = 4095
   std::vector<long> mvec = {7, 5, 9, 13};
   // Generating set of Zm* group.
   std::vector<long> gens = {2341, 3277, 911};
