@@ -16,7 +16,15 @@
 #include <helib/binaryCompare.h>
 #include <helib/intraSlot.h>
 
-//#define DEBUG
+#define TIME
+#define SUCCESS
+
+#ifndef TIME
+    #define DEBUG
+    #define ENTRIES 20
+#endif
+
+
 
 void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
 void inv_module(helib::Ctxt& c, const long bitSize);
@@ -100,126 +108,107 @@ int main(int argc, char* argv[])
 
   /*------------------------- MODIFICAITONS TO EXAMPLE STARTS HERE --------------------- */
 
-  // Generate three random binary numbers a, b, c.
-  // Encrypt them under BGV.
-  // Calculate a * b + c with HElib's binary arithmetic functions, then decrypt
-  // the result.
-  // Next, calculate a + b + c with HElib's binary arithmetic functions, then
-  // decrypt the result.
-  // Finally, calculate popcnt(a) with HElib's binary arithmetic functions, then
-  // decrypt the result.  Note that popcnt, also known as hamming weight or bit
-  // summation, returns the count of non-zero bits.
+  const long bitSize = 16; // Number of bits that the comparison cares for.
 
-  // Note: several numbers can be encoded across the slots of each ciphertext
-  // which would result in several parallel slot-wise operations.
-  // For simplicity we place the same data into each slot of each ciphertext,
-  // printing out only the back of each vector.
-  const long bitSize = 16;
-  long vals = 2;
-  long outSize = 2 * bitSize;
-  long a_data = 0b0000000111111111;
-  long b_data = 0b0000000111111110;
+#ifdef ENTRIES
+  long entries = std::abs(ENTRIES) > ea.size() ? ea.size() : std::abs(ENTRIES);
+#else
+  long entries = ea.size();
+#endif
 
+  std::vector<long> search_pool(entries);
+
+  for (auto& e : search_pool)
+      e = NTL::RandomBits_long(bitSize);
+
+#ifdef SUCCESS
+  long search_val = search_pool[entries / 2];
+#else
+  long search_val = 0b0000000111111110;
+#endif
+
+#ifdef DEBUG
   std::cout << "Pre-encryption data:" << std::endl;
-  std::cout << "a = " << a_data << std::endl;
-  std::cout << "b = " << b_data << std::endl;
+  std::cout << "search_pool = " << helib::vecToStr(search_pool) << std::endl;
+  std::cout << "search_val = " << search_val << std::endl;
+#endif
 
   // Use a scratch ciphertext to populate vectors.
   helib::Ctxt scratch(public_key);
-  std::vector<helib::Ctxt> encrypted_a(bitSize, scratch); // Numbers to be searched.
-  std::vector<helib::Ctxt> encrypted_b(bitSize, scratch); // Search value.
+  std::vector<helib::Ctxt> encrypted_pool(bitSize, scratch);
+  std::vector<helib::Ctxt> encrypted_search(bitSize, scratch);
   // Encrypt the data in binary representation.
   for (long i = 0; i < bitSize; ++i) {
-      std::vector<long> a_vec(ea.size());
-      std::vector<long> b_vec(ea.size());
-      a_vec[0] = (a_data >> i) & 1;
-      a_vec[1] = (b_data >> i) & 1;
-      for (auto& slot : b_vec) // Fill all slots with search value.
-        slot = (b_data >> i) & 1;
+      std::vector<long> pool_vec(ea.size());
+      std::vector<long> search_vec(ea.size());
+      for (long j = 0; j < entries; j++)
+          pool_vec[j] = (search_pool[j] >> i) & 1;
+      for (auto& slot : search_vec)
+        slot = (search_val >> i) & 1;
 
-      ea.encrypt(encrypted_a[i], public_key, a_vec);
-      ea.encrypt(encrypted_b[i], public_key, b_vec);
+      ea.encrypt(encrypted_pool[i], public_key, pool_vec);
+      ea.encrypt(encrypted_search[i], public_key, search_vec);
   }
 
-#ifdef DEBUG
-  std::vector<long> debug;
-  helib::decryptBinaryNums(debug, helib::CtPtrs_vectorCt(encrypted_a), secret_key, ea);
-  std::cout << "DEBUG: a before operation = " << helib::vecToStr(debug) << std::endl;
-  debug.clear();
-  helib::decryptBinaryNums(debug, helib::CtPtrs_vectorCt(encrypted_b), secret_key, ea);
-  std::cout << "DEBUG: b before operation = " << helib::vecToStr(debug) << std::endl;
+  /* OPERATIONS BEGIN*/
+#ifdef TIME
+  helib::setTimersOn();
 #endif
-  // Although in general binary numbers are represented here as
-  // std::vector<helib::Ctxt> the binaryArith APIs for HElib use the PtrVector
-  // wrappers instead, e.g. helib::CtPtrs_vectorCt. These are nothing more than
-  // thin wrapper classes to standardise access to different vector types, such
-  // as NTL::Vec and std::vector. They do not take ownership of the underlying
-  // object but merely provide access to it.
-  //
-  // helib::CtPtrMat_vectorCt is a wrapper for
-  // std::vector<std::vector<helib::Ctxt>>, used for representing a list of
-  // encrypted binary numbers.
-
   helib::Ctxt mu(public_key);
   helib::Ctxt ni(public_key);
   helib::compareTwoNumbers(
           mu, // a > b ? 1 : 0
           ni, // a > b ? 0 : 1
-          helib::CtPtrs_vectorCt(encrypted_a),
-          helib::CtPtrs_vectorCt(encrypted_b),
+          helib::CtPtrs_vectorCt(encrypted_pool),
+          helib::CtPtrs_vectorCt(encrypted_search),
           &unpackSlotEncoding);
-
-#ifdef DEBUG
-  std::vector<long> debug_mu;
-  std::vector<long> debug_ni;
-  ea.decrypt(mu, secret_key,debug_mu);
-  ea.decrypt(ni, secret_key, debug_ni);
-  std::cout << "DEBUG: mu = " << helib::vecToStr(debug_mu) << std::endl;
-  std::cout << "DEBUG: ni = " << helib::vecToStr(debug_ni) << std::endl;
-  std::cout << std::endl;
-#endif
 
   /* The numbers we compare are equal if mu = ni = 0.
    * Therefore inverting mu and ni will yield the answer 1 if both are 0,
-   * and if one or both of them are 1 beforehand then the answer will be 0. */
+   * and if one or both of them are 1 beforehand then the answer will be 0.
+   */
   inv_module(mu, 1);
   inv_module(ni, 1);
 
-#ifdef DEBUG
-  debug_mu.clear();
-  debug_ni.clear();
-  ea.decrypt(mu, secret_key,debug_mu);
-  ea.decrypt(ni, secret_key, debug_ni);
-  std::cout << "DEBUG inv: mu = " << helib::vecToStr(debug_mu) << std::endl;
-  std::cout << "DEBUG inv: ni = " << helib::vecToStr(debug_ni) << std::endl;
-  std::cout << std::endl;
-#endif
-
   mu *= ni;
+
+  /* Unwanted slots get shifted out,
+   * then the ciphertext get rotated to the original position.
+   */
   long unwanted_slots = ea.size() - bitSize;
   ea.shift(mu, unwanted_slots);
   ea.rotate(mu, bitSize);
-
-#ifdef DEBUG
-  debug_mu.clear();
-  ea.decrypt(mu, secret_key,debug_mu);
-  std::cout << "DEBUG mul: mu = " << helib::vecToStr(debug_mu) << std::endl;
-  std::cout << std::endl;
+#ifdef TIME
+  helib::setTimersOff();
 #endif
+  /* OPERATIONS END*/
 
+  /* Dump the result. */
   std::vector<long> decrypted_result;
   std::vector<long> decrypted_a;
   std::vector<long> decrypted_b;
   ea.decrypt(mu, secret_key, decrypted_result);
-  helib::decryptBinaryNums(decrypted_a, helib::CtPtrs_vectorCt(encrypted_a), secret_key, ea);
-  helib::decryptBinaryNums(decrypted_b, helib::CtPtrs_vectorCt(encrypted_b), secret_key, ea);
+  helib::decryptBinaryNums(decrypted_a, helib::CtPtrs_vectorCt(encrypted_pool), secret_key, ea);
+  helib::decryptBinaryNums(decrypted_b, helib::CtPtrs_vectorCt(encrypted_search), secret_key, ea);
 
-  for (long i = 0; i < vals; i++) {
+  unsigned int matches = 0;
+  for (long i = 0; i < entries; i++) {
+#ifdef DEBUG
       if (decrypted_result[i])
         std::cout << "Comparison: " << decrypted_a[i] << " = " << decrypted_b[i] << std::endl;
       else
         std::cout << "Comparison: " << decrypted_a[i] << " != " << decrypted_b[i] << std::endl;
+#endif
+      if (decrypted_result[i])
+          matches++;
   }
+
+  std::cout << "Found " << matches << " matching entries for "
+      << search_val << " in search_pool" << std::endl;
+
+#ifdef TIME
+  helib::printAllTimers();
+#endif
 
   return 0;
 }
@@ -227,27 +216,33 @@ int main(int argc, char* argv[])
 void
 inv_module(std::vector<helib::Ctxt>& v, const long bitSize)
 {
+    FHE_TIMER_START;
     long all1 = gen1s(bitSize);
 
     for (auto& slot : v)
         slot.xorConstant(NTL::ZZX(all1));
+    FHE_TIMER_STOP;
 }
 
 void
 inv_module(helib::Ctxt& c, const long bitSize)
 {
+    FHE_TIMER_START;
     long all1 = gen1s(bitSize);
 
     c.xorConstant(NTL::ZZX(all1));
+    FHE_TIMER_STOP;
 }
 
 long
 gen1s(const long bitSize)
 {
+    FHE_TIMER_START;
     long all1 = 0;
     for (int i = 0; i < bitSize; i++) {
         all1 <<= 1;
         all1 |= 1;
     }
+    FHE_TIMER_STOP;
     return all1;
 }
