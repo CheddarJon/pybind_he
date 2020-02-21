@@ -13,12 +13,15 @@
 
 #include <helib/helib.h>
 #include <helib/binaryArith.h>
+#include <helib/binaryCompare.h>
 #include <helib/intraSlot.h>
 
 void sub_module(helib::CtPtrs& res, std::vector<helib::Ctxt> a,
         std::vector<helib::Ctxt> b, std::vector<helib::Ctxt> enc_1, helib::Ctxt scratch,
         const long bitSize, std::vector<helib::zzX> unpackSlotEncoding);
 void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
+void inv_module(helib::Ctxt& c, const long bitSize);
+long gen1s(const long bitSize);
 
 int main(int argc, char* argv[])
 {
@@ -112,7 +115,7 @@ int main(int argc, char* argv[])
   const long bitSize = 16;
   long outSize = 2 * bitSize;
   long a_data = 0b0000000111111111;
-  long b_data = 0b0000000011111111;
+  long b_data = 0b0000000111111111;
   long c_data = 0b1111111111111111;
   long d_data = 0b0000000000000001;
 
@@ -160,68 +163,34 @@ int main(int argc, char* argv[])
   // std::vector<std::vector<helib::Ctxt>>, used for representing a list of
   // encrypted binary numbers.
 
-  // Perform the subtraction first and put it in encrypted_product.
-  // TODO extract block to a subtract Module.
-  /*std::vector<helib::Ctxt> res;
-  helib::CtPtrs_vectorCt wres(res);
-  helib::addTwoNumbers(
-          wres,
+  helib::Ctxt mu(public_key);
+  helib::Ctxt ni(public_key);
+  helib::compareTwoNumbers(
+          mu, // a > b ? 1 : 0
+          ni, // a > b ? 0 : 1
+          helib::CtPtrs_vectorCt(encrypted_a),
           helib::CtPtrs_vectorCt(encrypted_b),
-          helib::CtPtrs_vectorCt(encrypted_c),
-          bitSize,
           &unpackSlotEncoding);
-  */
-  std::vector<helib::Ctxt> diff;
-  helib::CtPtrs_vectorCt wdiff(diff);
-  sub_module(
-          wdiff,
-          encrypted_a,
-          encrypted_b,
-          encrypted_d,
-          scratch,
-          bitSize,
-          unpackSlotEncoding);
+
+  /* The numbers we compare are equal if mu = ni = 0.
+   * Therefore inverting mu and ni will yield the answer 1 if both are 0,
+   * and if one or both of them are 1 beforehand then the answer will be 0. */
+  inv_module(mu, 1);
+  inv_module(ni, 1);
+  mu *= ni;
 
   std::vector<long> decrypted_result;
-  helib::decryptBinaryNums(decrypted_result, wdiff, secret_key, ea);
-  std::cout << "a-b = " << decrypted_result.back() << std::endl;
+  std::vector<long> decrypted_a;
+  std::vector<long> decrypted_b;
+  ea.decrypt(mu, secret_key, decrypted_result);
+  helib::decryptBinaryNums(decrypted_a, helib::CtPtrs_vectorCt(encrypted_a), secret_key, ea);
+  helib::decryptBinaryNums(decrypted_b, helib::CtPtrs_vectorCt(encrypted_b), secret_key, ea);
 
-  inv_module(diff, bitSize);
-  decrypted_result.clear();
-  helib::decryptBinaryNums(decrypted_result, helib::CtPtrs_vectorCt(diff), secret_key, ea);
-  std::cout << "inv(a-b) = " << decrypted_result.back() << std::endl;
+  if (decrypted_result.back())
+      std::cout << "Comparison: " << decrypted_a.back() << " = " << decrypted_b.back() << std::endl;
+  else
+      std::cout << "Comparison: " << decrypted_a.back() << " != " << decrypted_b.back() << std::endl;
 
-  // Now calculate the sum of a, b and c using the addManyNumbers function.
-  /*
-  encrypted_result.clear();
-  decrypted_result.clear();
-  std::vector<std::vector<helib::Ctxt>> summands = {
-      encrypted_a, encrypted_b, encrypted_c};
-  helib::CtPtrMat_vectorCt summands_wrapper(summands);
-  helib::addManyNumbers(
-      result_wrapper,
-      summands_wrapper,
-      0,                    // sizeLimit=0 means use as many bits as needed.
-      &unpackSlotEncoding); // Information needed for bootstrapping.
-
-  // Decrypt and print the result.
-  helib::decryptBinaryNums(decrypted_result, result_wrapper, secret_key, ea);
-  std::cout << "a+b+c = " << decrypted_result.back() << std::endl;
-
-  // This section calculates popcnt(a) using the fifteenOrLess4Four
-  // function.
-  // Note: the output i.e. encrypted_result should be of size 4
-  // because 4 bits are required to represent numbers in [0,15].
-  encrypted_result.resize(4lu, scratch);
-  decrypted_result.clear();
-  encrypted_a.pop_back(); // drop the MSB since we only support up to 15 bits.
-  helib::fifteenOrLess4Four(result_wrapper,
-                            helib::CtPtrs_vectorCt(encrypted_a));
-
-  // Decrypt and print the result.
-  helib::decryptBinaryNums(decrypted_result, result_wrapper, secret_key, ea);
-  std::cout << "popcnt(a) = " << decrypted_result.back() << std::endl;
-*/
   return 0;
 }
 
@@ -256,12 +225,27 @@ sub_module(helib::CtPtrs& res, std::vector<helib::Ctxt> a,
 void
 inv_module(std::vector<helib::Ctxt>& v, const long bitSize)
 {
+    long all1 = gen1s(bitSize);
+
+    for (auto& slot : v)
+        slot.xorConstant(NTL::ZZX(all1));
+}
+
+void
+inv_module(helib::Ctxt& c, const long bitSize)
+{
+    long all1 = gen1s(bitSize);
+
+    c.xorConstant(NTL::ZZX(all1));
+}
+
+long
+gen1s(const long bitSize)
+{
     long all1 = 0;
     for (int i = 0; i < bitSize; i++) {
         all1 <<= 1;
         all1 |= 1;
     }
-
-    for (auto& slot : v)
-        slot.xorConstant(NTL::ZZX(all1));
+    return all1;
 }
