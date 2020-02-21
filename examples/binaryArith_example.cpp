@@ -16,9 +16,6 @@
 #include <helib/binaryCompare.h>
 #include <helib/intraSlot.h>
 
-void sub_module(helib::CtPtrs& res, std::vector<helib::Ctxt> a,
-        std::vector<helib::Ctxt> b, std::vector<helib::Ctxt> enc_1, helib::Ctxt scratch,
-        const long bitSize, std::vector<helib::zzX> unpackSlotEncoding);
 void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
 void inv_module(helib::Ctxt& c, const long bitSize);
 long gen1s(const long bitSize);
@@ -192,34 +189,6 @@ int main(int argc, char* argv[])
       std::cout << "Comparison: " << decrypted_a.back() << " != " << decrypted_b.back() << std::endl;
 
   return 0;
-}
-
-void
-sub_module(helib::CtPtrs& res, std::vector<helib::Ctxt> a,
-        std::vector<helib::Ctxt> b, std::vector<helib::Ctxt> enc_1, helib::Ctxt scratch,
-        const long bitSize, std::vector<helib::zzX> unpackSlotEncoding)
-{
-
-    std::vector<helib::Ctxt> b_comp1(bitSize, scratch);
-    helib::vecCopy(b_comp1, b);
-
-    inv_module(b_comp1, bitSize);
-
-    std::vector<helib::Ctxt> b_comp2;
-    helib::CtPtrs_vectorCt wb_comp2(b_comp2);
-    helib::addTwoNumbers(
-          wb_comp2,
-          helib::CtPtrs_vectorCt(b_comp1),
-          helib::CtPtrs_vectorCt(enc_1),
-          bitSize,
-          &unpackSlotEncoding);
-
-    helib::addTwoNumbers(
-          res,
-          helib::CtPtrs_vectorCt(a),
-          wb_comp2,
-          bitSize,
-          &unpackSlotEncoding);
 }
 
 void
