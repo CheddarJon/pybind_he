@@ -16,12 +16,12 @@
 #include <helib/binaryCompare.h>
 #include <helib/intraSlot.h>
 
-#define TIME
+//#define TIME
 #define SUCCESS
 
 #ifndef TIME
     #define DEBUG
-    #define ENTRIES 20
+    #define ENTRIES 80
 #endif
 
 void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
@@ -170,18 +170,38 @@ int main(int argc, char* argv[])
 
   mu *= ni;
 
+#ifdef DEBUG
+  std::vector<long> dbg;
+  ea.decrypt(mu, secret_key, dbg);
+  std::cout << "[DEBUG] mu before masking: " << helib::vecToStr(dbg) << std::endl;
+#endif
+
   /* Unwanted slots get shifted out,
    * then the ciphertext get rotated to the original position.
-   * TODO Either shift back or rotate depending on what is cheapest.
    */
   long unwanted_slots = ea.size() - entries;
-  ea.shift(mu, unwanted_slots);
-  ea.rotate(mu, bitSize);
+  if (unwanted_slots != 0) {
+    ea.shift(mu, unwanted_slots);
+
+    if (unwanted_slots < entries) {
+      ea.shift(mu, -unwanted_slots);
+      std::cout << "DEBUG: shift -unwanted_slots" << std::endl;
+    }
+    else {
+      ea.rotate(mu, entries);
+      std::cout << "DEBUG: rotate entries" << std::endl;
+    }
+  }
+#ifdef DEBUG
+  dbg.clear();
+  ea.decrypt(mu, secret_key, dbg);
+  std::cout << "[DEBUG] mu after masking: " << helib::vecToStr(dbg) << std::endl;
+#endif
 #ifdef TIME
   helib::setTimersOff();
 #endif
-  /* OPERATIONS END*/
 
+  /* OPERATIONS END*/
   /* Dump the result. */
   std::vector<long> decrypted_result;
   std::vector<long> decrypted_a;
