@@ -172,8 +172,9 @@ int main(int argc, char* argv[])
 
   /* Unwanted slots get shifted out,
    * then the ciphertext get rotated to the original position.
+   * TODO Either shift back or rotate depending on what is cheapest.
    */
-  long unwanted_slots = ea.size() - bitSize;
+  long unwanted_slots = ea.size() - entries;
   ea.shift(mu, unwanted_slots);
   ea.rotate(mu, bitSize);
 #ifdef TIME
