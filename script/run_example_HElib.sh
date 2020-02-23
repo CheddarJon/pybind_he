@@ -6,8 +6,7 @@
 # good ;)
 
 
-prefix=$(realpath ../lib/helib_path)
-export CMAKE_PREFIX_PATH="$prefix"
+./export_HElib_pack_path.sh
 cd ../examples/
 ./build.sh
 sleep 1 # BUILD STEP DONE
