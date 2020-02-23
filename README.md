@@ -20,3 +20,7 @@ Copy .so file from build directory into lib/
 ###  For sanity check:
 
 [SANITY](docs/SANITY_CHECK.md) 
+
+### Procedure 
+
+[PROCEDURE](docs/WSL_PROCEDURE.md) 

@@ -9,4 +9,3 @@ pwd
 cmake -DPACKAGE_BUILD=ON -DCMAKE_INSTALL_PREFIX=/build
 make -j16
 make test
-cp -r ../submodules/HElib/helib_pack ../lib

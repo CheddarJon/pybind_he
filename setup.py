@@ -9,7 +9,7 @@ setup(name="pybind_he",
         ext_modules= [
             Extension("helib_bgv",
                 sources = ["pybind_he/helib_bgv.cpp"],
-                include_dirs = ['lib/helib_pack/include',],
+                include_dirs = ['lib/helib_pack/include', 'lib/pybind11'],
                 library_dirs = ['lib/helib_pack/lib',],
                 libraries = ['helib', 'gmp', 'ntl'],
             ),

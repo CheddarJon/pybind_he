@@ -11,6 +11,9 @@ submodules/Pybind
 *.egg-info
 *~
 
-# Examples
-examples/bin
-examples/build
+# Ignore everything build and bin
+*build
+*bin
+
+# Ignore everything under lib
+lib/*
