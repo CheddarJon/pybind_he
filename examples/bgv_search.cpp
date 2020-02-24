@@ -20,8 +20,8 @@
 #define SUCCESS
 
 #ifndef TIME
-    #define DEBUG
-    #define ENTRIES 80
+    //#define DEBUG
+    //#define ENTRIES 80
 #endif
 
 void inv_module(std::vector<helib::Ctxt>& v, const long bitSize);
@@ -43,19 +43,19 @@ int main(int argc, char* argv[])
   // Plaintext prime modulus.
   long p = 2;
   // Cyclotomic polynomial - defines phi(m).
-  long m = 4095;
+  long m = 20263;
   // Hensel lifting (default = 1).
   long r = 1;
   // Number of bits of the modulus chain.
-  long bits = 500;
+  long bits = 300;
   // Number of columns of Key-Switching matrix (typically 2 or 3).
-  long c = 2;
+  long c = 3;
   // Factorisation of m required for bootstrapping. m = 4095
-  std::vector<long> mvec = {7, 5, 9, 13};
+  std::vector<long> mvec = {23, 881};
   // Generating set of Zm* group.
-  std::vector<long> gens = {2341, 3277, 911};
+  std::vector<long> gens = {14978, 17688};
   // Orders of the previous generators.
-  std::vector<long> ords = {6, 4, 6};
+  std::vector<long> ords = {22, 16};
 
   std::cout << "Initialising context object..." << std::endl;
   // Intialise the context.
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
   // Create a secret key associated with the context.
   helib::SecKey secret_key(context);
   // Generate the secret key.
-  secret_key.GenSecKey();
+  secret_key.GenSecKey(64);
 
   // This is needed to get rid of unwanted ciphertext slots in the end.
   addSome1DMatrices(secret_key);
