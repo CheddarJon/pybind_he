@@ -1,9 +1,8 @@
-class ParamWrap {
-public:
+struct ParamWrap {
     long m;
     std::vector<long> mvec;
     std::vector<long> gvec;
     std::vector<long> ovec;
 };
 
-void generateParameters(std::vector<ParamWrap>& retv, int argc, char *argv[]);
+void generateParameters(int argc, char *argv[]);

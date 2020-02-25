@@ -24,6 +24,7 @@ using namespace NTL;
 
 #include <helib/NumbTh.h>
 #include <helib/PAlgebra.h>
+#include <helib/PtrVector.h>
 #include <iomanip>
 #include <cassert>
 #include <helib/ArgMap.h>
@@ -71,6 +72,8 @@ bool comparePhi(const Pair<long,long>& x, const Pair<long,long>& y)
     return computePhi(x) < computePhi(y);
 }
 
+static std::vector<ParamWrap> params;
+
 /* Usage: params_x.exe [ name=value ]...
  *  gens flag to output mvec, gens, and ords  [ default=0 ]
  *  info flag to output descriptive info about m  [ default=1 ]
@@ -80,18 +83,11 @@ bool comparePhi(const Pair<long,long>& x, const Pair<long,long>& y)
  *  m    use only the specified m value
  *  ret  maximum number of parametersets to be returned [ default=1 ]
  */
-//TODO Make this callable from another program.
-//      Create a header file.
-//      Change name of the function.
-//      Change return type -> nested vector/array of long.
-//          Specify return format e.g. m, factors, generators, orders
-//TODO Change default parameters so that fewer parameters are generated.
-//TODO Only save 'good' parameters.
-void generateParameters(vector<ParamWrap>& retv, int argc, char *argv[])
+void generateParameters(int argc, char *argv[])
 {
     helib::ArgMap amap;
 
-    long gens_flag = 1;
+    long gens_flag = 0;
     amap.arg("gens", gens_flag, "flag to output mvec, gens, and ords");
 
     long info_flag = 1;
@@ -120,7 +116,7 @@ void generateParameters(vector<ParamWrap>& retv, int argc, char *argv[])
     if (m_arg) lo = hi = m_arg;
 
 
-    for (long m = lo; m <= hi; m += 2) {
+    for (long m = lo; m <= hi && ret_len > 0; m += 2) {
 
         if (GCD(p, m) != 1)
             continue;
@@ -311,11 +307,27 @@ void generateParameters(vector<ParamWrap>& retv, int argc, char *argv[])
         // We do not want to save bad parameters.
         if (!good_gen)
             continue;
+
+        if (ret_len-- > 0) {
+            struct ParamWrap p;
+            p.m = m;
+            helib::vecCopy(p.mvec, rev(fac2));
+            helib::vecCopy(p.gvec, trunc(rev(global_gen)));
+            helib::vecCopy(p.ovec, trunc(rev(ordvec)));
+
+            params.push_back(p);
+        }
     }
 }
 
 int main(int argc, char *argv[])
 {
+    generateParameters(argc, argv);
+    cout << "DEBUG: size of params: " << params.size() << endl;
+    cout << "DEBUG: " << params[0].m << endl;
+    cout << "DEBUG: " << helib::vecToStr(params[0].mvec) << endl;
+    cout << "DEBUG: " << helib::vecToStr(params[0].gvec) << endl;
+    cout << "DEBUG: " << helib::vecToStr(params[0].ovec) << endl;
     return 0;
 }
 
