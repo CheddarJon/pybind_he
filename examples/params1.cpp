@@ -25,6 +25,7 @@ using namespace NTL;
 #include <helib/NumbTh.h>
 #include <helib/PAlgebra.h>
 #include <helib/PtrVector.h>
+#include <helib/helib.h>
 #include <iomanip>
 #include <cassert>
 
@@ -83,7 +84,7 @@ static std::vector<ParamWrap> params;
  *  mret maximum number of parametersets to be returned [ default=1 ]
  */
 void generateParameters(
-        long gens_flag, long info_flag, long p, long lo, long hi, long m_arg, long mret)
+        long mret, long gens_flag, long info_flag, long p, long lo, long hi, long m_arg)
 {
     if (lo % 2 == 0) lo++;
 
@@ -285,6 +286,7 @@ void generateParameters(
         if (mret-- > 0) {
             ParamWrap p;
             p.m = m;
+            p.phim = phim;
             helib::vecCopy(p.mvec, rev(fac2));
             helib::vecCopy(p.gvec, trunc(rev(global_gen)));
             helib::vecCopy(p.ovec, trunc(rev(ordvec)));
@@ -294,13 +296,32 @@ void generateParameters(
     }
 }
 
-int main(int argc, char *argv[])
+int findParam(long security, long L, long c)
 {
+    /*
+     * To get k-bit security we need N > log(Q0/sigma)(k + 110) / 7.2 i.e. roughly
+     *      N > L(1 + 1/c)(k + 110) / 7.2
+     *      k = 7.2N / L(1 + 1/c) - 110
+     */
     generateParameters();
     cout << "DEBUG: size of params: " << params.size() << endl;
-    cout << "DEBUG: " << params[0].m << endl;
-    cout << "DEBUG: " << helib::vecToStr(params[0].mvec) << endl;
-    cout << "DEBUG: " << helib::vecToStr(params[0].gvec) << endl;
-    cout << "DEBUG: " << helib::vecToStr(params[0].ovec) << endl;
+
+    for (int i = 0; i < params.size(); i++) {
+        double cc = 1 + (1/c);
+        double nom = 7.2 * params[i].phim;
+        double denom = cc * L;
+        long k = floor((nom / denom) - 110);
+
+        if (k >= security)
+            return i;
+    }
+    return -1;
+}
+
+int main(int argc, char *argv[])
+{
+    int ret = findParam(200, 300, 3);
+    cout << "returnval: " << ret << std::endl;
+    cout << "m val=" << params[ret].m << std::endl;
     return 0;
 }
