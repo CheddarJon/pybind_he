@@ -1,6 +1,9 @@
 #include <iostream>
 #include <pybind11/pybind11.h>
 #include <helib/helib.h>
+/* This is how */
+//#include "pybind_he/pybind_he/HiHeader.h"
+
 
 /*
 	The pybind_he will be THE module that enables already identified HElib
@@ -29,10 +32,10 @@ int john_helib() {
 
     std::cout << "Initialising context object..." << std::endl;
     // Intialise context
-    Context context(m, p, r);
+/*    Context context(m, p, r);
     // Modify the context, adding primes to the modulus chain
     std::cout  << "Building modulus chain..." << std::endl;
-    buildModChain(context, bits, c);
+     buildModChain(context, bits, c);
 
     // Print the context
     context.zMStar.printout();
@@ -62,7 +65,7 @@ int john_helib() {
     long nslots = ea.size();
     std::cout << "Number of slots: " << nslots << std::endl;
 
-    /*---------------------------- END OF GENERIC BGV CODE ------------------------- */
+    // ---------------------------- END OF GENERIC BGV CODE ------------------------- 
 
     // Matrix dimensions rows x cols
     const long rows = 96;
@@ -142,7 +145,9 @@ int john_helib() {
     std::cout << "Result of select and accumulate: " << vecToStr(selector) << std::endl;
     printAllTimers();
 
-    return 0;
+    */
+
+return 0;
 }
 
 #ifndef BARE_BONE
