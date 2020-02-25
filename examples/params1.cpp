@@ -109,9 +109,6 @@ void generateParameters(Vec<Vec<long>>& ret, char *argv[])
 
     amap.parse(argc, argv);
 
-    if (!info_flag && !gens_flag)
-        return 0;
-
     if (lo % 2 == 0) lo++;
 
     if (m_arg) lo = hi = m_arg;
@@ -300,8 +297,10 @@ void generateParameters(Vec<Vec<long>>& ret, char *argv[])
         }
 
 
-        cout << "\n";
-        cout.flush();
+        if (gens_flag || info_flag) {
+            cout << "\n";
+            cout.flush();
+        }
    }
 }
 
