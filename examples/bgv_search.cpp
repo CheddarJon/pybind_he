@@ -16,6 +16,8 @@
 #include <helib/binaryCompare.h>
 #include <helib/intraSlot.h>
 
+#include "params.h"
+
 //#define TIME
 #define SUCCESS
 
@@ -30,32 +32,27 @@ long gen1s(const long bitSize);
 
 int main(int argc, char* argv[])
 {
-  /*  Example of binary arithmetic using the BGV scheme  */
-
-  // First set up parameters.
-  //
-  // NOTE: The parameters used in this example code are for demonstration only.
-  // They were chosen to provide the best performance of execution while
-  // providing the context to demonstrate how to use the "Binary Arithmetic
-  // APIs". The parameters do not provide the security level that might be
-  // required by real use/application scenarios.
-
-  // Plaintext prime modulus.
   long p = 2;
-  // Cyclotomic polynomial - defines phi(m).
-  long m = 20263;
-  // Hensel lifting (default = 1).
   long r = 1;
-  // Number of bits of the modulus chain.
-  long bits = 300;
-  // Number of columns of Key-Switching matrix (typically 2 or 3).
+  long bits = 230;
   long c = 3;
-  // Factorisation of m required for bootstrapping. m = 4095
-  std::vector<long> mvec = {23, 881};
-  // Generating set of Zm* group.
-  std::vector<long> gens = {14978, 17688};
-  // Orders of the previous generators.
-  std::vector<long> ords = {22, 16};
+  long security = 250;
+  long m;
+  std::vector<long> mvec;
+  std::vector<long> gens;
+  std::vector<long> ords;
+
+  int pindex = findParam(security, bits, c);
+
+  if (pindex == -1) {
+      std::cout << "Could not find a value for m..." << std::endl;
+      return -1;
+  } else {
+      m = getM(pindex);
+      getMVEC(mvec, pindex);
+      getGVEC(gens, pindex);
+      getOVEC(ords, pindex);
+  }
 
   std::cout << "Initialising context object..." << std::endl;
   // Intialise the context.
