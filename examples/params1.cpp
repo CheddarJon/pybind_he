@@ -84,7 +84,7 @@ bool comparePhi(const Pair<long,long>& x, const Pair<long,long>& y)
 //          Specify return format e.g. m, factors, generators, orders
 //TODO Change default parameters so that fewer parameters are generated.
 //TODO Only save 'good' parameters.
-void generateParameters(Vec<Vec<long>>& ret, char *argv[])
+void generateParameters(Vec<Vec<long>>& ret, int argc, char *argv[])
 {
     helib::ArgMap amap;
 
@@ -304,7 +304,10 @@ void generateParameters(Vec<Vec<long>>& ret, char *argv[])
    }
 }
 
-
+int main(int argc, char *argv[])
+{
+    return 0;
+}
 
 
 // params_x | sort -snk3 | sort -snk2 | sort -snk1 > params.txt
