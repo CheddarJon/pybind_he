@@ -5,4 +5,11 @@ typedef struct {
     std::vector<long> ovec;
 } ParamWrap;
 
-void generateParameters(int argc, char *argv[]);
+void generateParameters(
+        long gens_flag=0,
+        long info_flag=0,
+        long p=2,
+        long lo=1001,
+        long hi=80000,
+        long m_arg=0,
+        long mret=1);

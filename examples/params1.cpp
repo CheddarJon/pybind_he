@@ -81,42 +81,17 @@ static std::vector<ParamWrap> params;
  *  lo   low value for m range  [ default=1001 ]
  *  hi   high value for m range  [ default=80000 ]
  *  m    use only the specified m value
- *  ret  maximum number of parametersets to be returned [ default=1 ]
+ *  mret maximum number of parametersets to be returned [ default=1 ]
  */
-void generateParameters(int argc, char *argv[])
+void generateParameters(
+        long gens_flag, long info_flag, long p, long lo, long hi, long m_arg, long mret)
 {
-    helib::ArgMap amap;
-
-    long gens_flag = 0;
-    amap.arg("gens", gens_flag, "flag to output mvec, gens, and ords");
-
-    long info_flag = 0;
-    amap.arg("info", info_flag, "flag to output descriptive info about m");
-
-    long p = 2;
-    amap.arg("p", p, "plaintext base");
-
-    long lo = 1001;
-    amap.arg("lo", lo, "low value for m range");
-
-    long hi = 80000;
-    amap.arg("hi", hi, "high value for m range");
-
-    long m_arg = 0;
-    amap.arg("m", m_arg, "use only the specified m value", NULL);
-
-    long ret_len = 1;
-    amap.arg("ret", ret_len, "maximum number of parametersets to be returned");
-
-
-    amap.parse(argc, argv);
-
     if (lo % 2 == 0) lo++;
 
     if (m_arg) lo = hi = m_arg;
 
 
-    for (long m = lo; m <= hi && ret_len > 0; m += 2) {
+    for (long m = lo; m <= hi && mret > 0; m += 2) {
 
         if (GCD(p, m) != 1)
             continue;
@@ -308,7 +283,7 @@ void generateParameters(int argc, char *argv[])
         if (!good_gen)
             continue;
 
-        if (ret_len-- > 0) {
+        if (mret-- > 0) {
             ParamWrap p;
             p.m = m;
             helib::vecCopy(p.mvec, rev(fac2));
@@ -322,7 +297,7 @@ void generateParameters(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    generateParameters(argc, argv);
+    generateParameters();
     cout << "DEBUG: size of params: " << params.size() << endl;
     cout << "DEBUG: " << params[0].m << endl;
     cout << "DEBUG: " << helib::vecToStr(params[0].mvec) << endl;
@@ -330,6 +305,3 @@ int main(int argc, char *argv[])
     cout << "DEBUG: " << helib::vecToStr(params[0].ovec) << endl;
     return 0;
 }
-
-
-// params_x | sort -snk3 | sort -snk2 | sort -snk1 > params.txt
