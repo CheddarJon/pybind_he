@@ -27,7 +27,6 @@ using namespace NTL;
 #include <helib/PtrVector.h>
 #include <iomanip>
 #include <cassert>
-#include <helib/ArgMap.h>
 
 #include "params.h"
 
