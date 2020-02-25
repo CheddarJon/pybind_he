@@ -9,9 +9,9 @@ ext_modules = [
         'pybind_he',
         ['{0}/pybind_he/pybind_he.cpp'.format(dir_path)],
         include_dirs=[
-            'lib/pybind11/pybind11'
+            '{0}/lib/pybind11'.format(dir_path)
         ],
-        language='c++'
+        #language='c++'
     ),
 ]
 
