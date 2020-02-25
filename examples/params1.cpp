@@ -28,6 +28,8 @@ using namespace NTL;
 #include <cassert>
 #include <helib/ArgMap.h>
 
+#include "params.h"
+
 // A heuristic measure for how good a certain (depth,cost) is
 long weighted_cost(long cost, long depth)
 {
@@ -76,6 +78,7 @@ bool comparePhi(const Pair<long,long>& x, const Pair<long,long>& y)
  *  lo   low value for m range  [ default=1001 ]
  *  hi   high value for m range  [ default=80000 ]
  *  m    use only the specified m value
+ *  ret  maximum number of parametersets to be returned [ default=1 ]
  */
 //TODO Make this callable from another program.
 //      Create a header file.
@@ -84,7 +87,7 @@ bool comparePhi(const Pair<long,long>& x, const Pair<long,long>& y)
 //          Specify return format e.g. m, factors, generators, orders
 //TODO Change default parameters so that fewer parameters are generated.
 //TODO Only save 'good' parameters.
-void generateParameters(Vec<Vec<long>>& ret, int argc, char *argv[])
+void generateParameters(vector<ParamWrap>& retv, int argc, char *argv[])
 {
     helib::ArgMap amap;
 
@@ -105,6 +108,9 @@ void generateParameters(Vec<Vec<long>>& ret, int argc, char *argv[])
 
     long m_arg = 0;
     amap.arg("m", m_arg, "use only the specified m value", NULL);
+
+    long ret_len = 1;
+    amap.arg("ret", ret_len, "maximum number of parametersets to be returned");
 
 
     amap.parse(argc, argv);
@@ -301,7 +307,11 @@ void generateParameters(Vec<Vec<long>>& ret, int argc, char *argv[])
             cout << "\n";
             cout.flush();
         }
-   }
+
+        // We do not want to save bad parameters.
+        if (!good_gen)
+            continue;
+    }
 }
 
 int main(int argc, char *argv[])
