@@ -90,7 +90,7 @@ void generateParameters(int argc, char *argv[])
     long gens_flag = 0;
     amap.arg("gens", gens_flag, "flag to output mvec, gens, and ords");
 
-    long info_flag = 1;
+    long info_flag = 0;
     amap.arg("info", info_flag, "flag to output descriptive info about m");
 
     long p = 2;
@@ -309,7 +309,7 @@ void generateParameters(int argc, char *argv[])
             continue;
 
         if (ret_len-- > 0) {
-            struct ParamWrap p;
+            ParamWrap p;
             p.m = m;
             helib::vecCopy(p.mvec, rev(fac2));
             helib::vecCopy(p.gvec, trunc(rev(global_gen)));
