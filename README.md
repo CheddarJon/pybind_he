@@ -24,3 +24,7 @@ Copy .so file from build directory into lib/
 ### Procedure 
 
 [PROCEDURE](docs/WSL_PROCEDURE.md) 
+
+### Visual Studio
+
+[Visual Studio](vs/VS.md) 
