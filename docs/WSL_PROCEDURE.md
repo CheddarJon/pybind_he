@@ -2,9 +2,9 @@
 1. Install Ubuntu from Microsoft Store
 2. Allow WSL by either
     Running the following command in powershell:
-    'Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux',
-    and restarting the system when prompted.
-    NOTE: you must run powershell as an administratro
+    `Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux`
+    ,and restarting the system when prompted. 
+    NOTE: you must run powershell as an administrator
     OR 
     Go to Conctorl Panel -> Programs -> Turn Windows features on or off, and select Windows Subsystem For Linux.
 3. Run Ubuntu and finish the setup process
