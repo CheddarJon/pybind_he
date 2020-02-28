@@ -12,13 +12,15 @@ To build run: python setup.py build
 
 Copy .so file from build directory into lib/
 
+## Start here:
+
+[PROCEDURE](docs/WSL_PROCEDURE.md) 
+
+__________________________________________________________________________________________________________________________________________________________________________
+
 ###  For sanity check:
 
 [SANITY](docs/SANITY_CHECK.md) 
-
-### Procedure 
-
-[PROCEDURE](docs/WSL_PROCEDURE.md) 
 
 ### Visual Studio
 
