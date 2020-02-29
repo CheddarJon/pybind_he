@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_EXTENSIONS OFF)
 ## Require full C++ standard
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(GPROF_FLAGS "-pg")
+set(DEBUG_FLAGS "-g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GPROF_FLAGS} ${DEBUG_FLAGS}")
 
 project(helib_test
        	LANGUAGES CXX)
