@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="cb" />
+		<Option pch_mode="2" />
+		<Option compiler="cygwin_gcc_compiler" />
+		<Build>
+			<Target title="Debug">
+				<Option output="cb/bin/Debug/cb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="cb/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="cygwin_gcc_compiler" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="cb/bin/Release/cb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="cb/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="cygwin_gcc_compiler" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../lib/helib_pack/include/NTL/ALL_FEATURES.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/BasicThreadPool.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ConfigLog.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/FFT.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/FFT_impl.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/FacVec.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2E.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2EX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2EXFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2X.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2XFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/GF2XVec.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_ALIGNED_ARRAY.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_AVX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_AVX2.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_AVX512F.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_BUILTIN_CLZL.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_CHRONO_TIME.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_COPY_TRAITS1.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_COPY_TRAITS2.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_FMA.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_LL_TYPE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_MACOS_TIME.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_PCLMUL.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_POSIX_TIME.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HAVE_SSSE3.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/HNF.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/LLL.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/Lazy.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/LazyTable.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/MatPrime.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/PD.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/PackageInfo.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/REPORT_ALL_FEATURES.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/RR.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/SmartPtr.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/WordVector.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZVec.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZXFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_limbs.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_pEX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_pEXFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_pX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ZZ_pXFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/config.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/ctools.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/fileio.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/gmp_aux.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lip.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lzz_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lzz_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lzz_pEX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lzz_pEXFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lzz_pX.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/lzz_pXFactoring.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mach_desc.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_GF2.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_GF2E.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_RR.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_ZZ.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_ZZ_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_ZZ_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_lzz_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_lzz_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_poly_ZZ.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_poly_ZZ_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/mat_poly_lzz_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/matrix.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/new.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_GF2EX_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_GF2X_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_ZZX_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_ZZ_pEX_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_ZZ_pX_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_lzz_pEX_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pair_lzz_pX_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/pd_FFT.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/quad_float.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/sp_arith.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/thread.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/tools.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_GF2.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_GF2E.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_GF2XVec.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_RR.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_ZZ.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_ZZVec.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_ZZ_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_ZZ_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_double.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_lzz_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_lzz_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_quad_float.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_ulong.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_GF2.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_GF2E.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_RR.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_ZZ.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_ZZ_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_ZZ_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_long.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_lzz_p.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_lzz_pE.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_vec_ulong.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vec_xdouble.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/vector.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/version.h" />
+		<Unit filename="../lib/helib_pack/include/NTL/xdouble.h" />
+		<Unit filename="../lib/helib_pack/include/gmp.h" />
+		<Unit filename="../lib/helib_pack/include/helib/ArgMap.h" />
+		<Unit filename="../lib/helib_pack/include/helib/CModulus.h" />
+		<Unit filename="../lib/helib_pack/include/helib/Context.h" />
+		<Unit filename="../lib/helib_pack/include/helib/CtPtrs.h" />
+		<Unit filename="../lib/helib_pack/include/helib/Ctxt.h" />
+		<Unit filename="../lib/helib_pack/include/helib/DoubleCRT.h" />
+		<Unit filename="../lib/helib_pack/include/helib/EncryptedArray.h" />
+		<Unit filename="../lib/helib_pack/include/helib/EvalMap.h" />
+		<Unit filename="../lib/helib_pack/include/helib/FHE.h" />
+		<Unit filename="../lib/helib_pack/include/helib/IndexMap.h" />
+		<Unit filename="../lib/helib_pack/include/helib/IndexSet.h" />
+		<Unit filename="../lib/helib_pack/include/helib/NumbTh.h" />
+		<Unit filename="../lib/helib_pack/include/helib/PAlgebra.h" />
+		<Unit filename="../lib/helib_pack/include/helib/PGFFT.h" />
+		<Unit filename="../lib/helib_pack/include/helib/PolyMod.h" />
+		<Unit filename="../lib/helib_pack/include/helib/PolyModRing.h" />
+		<Unit filename="../lib/helib_pack/include/helib/PtrMatrix.h" />
+		<Unit filename="../lib/helib_pack/include/helib/PtrVector.h" />
+		<Unit filename="../lib/helib_pack/include/helib/Ptxt.h" />
+		<Unit filename="../lib/helib_pack/include/helib/assertions.h" />
+		<Unit filename="../lib/helib_pack/include/helib/binaryArith.h" />
+		<Unit filename="../lib/helib_pack/include/helib/binaryCompare.h" />
+		<Unit filename="../lib/helib_pack/include/helib/binio.h" />
+		<Unit filename="../lib/helib_pack/include/helib/bluestein.h" />
+		<Unit filename="../lib/helib_pack/include/helib/clonedPtr.h" />
+		<Unit filename="../lib/helib_pack/include/helib/debugging.h" />
+		<Unit filename="../lib/helib_pack/include/helib/exceptions.h" />
+		<Unit filename="../lib/helib_pack/include/helib/fhe_stats.h" />
+		<Unit filename="../lib/helib_pack/include/helib/helib.h" />
+		<Unit filename="../lib/helib_pack/include/helib/hypercube.h" />
+		<Unit filename="../lib/helib_pack/include/helib/intraSlot.h" />
+		<Unit filename="../lib/helib_pack/include/helib/keySwitching.h" />
+		<Unit filename="../lib/helib_pack/include/helib/keys.h" />
+		<Unit filename="../lib/helib_pack/include/helib/matching.h" />
+		<Unit filename="../lib/helib_pack/include/helib/matmul.h" />
+		<Unit filename="../lib/helib_pack/include/helib/multicore.h" />
+		<Unit filename="../lib/helib_pack/include/helib/norms.h" />
+		<Unit filename="../lib/helib_pack/include/helib/permutations.h" />
+		<Unit filename="../lib/helib_pack/include/helib/polyEval.h" />
+		<Unit filename="../lib/helib_pack/include/helib/powerful.h" />
+		<Unit filename="../lib/helib_pack/include/helib/primeChain.h" />
+		<Unit filename="../lib/helib_pack/include/helib/randomMatrices.h" />
+		<Unit filename="../lib/helib_pack/include/helib/range.h" />
+		<Unit filename="../lib/helib_pack/include/helib/recryption.h" />
+		<Unit filename="../lib/helib_pack/include/helib/replicate.h" />
+		<Unit filename="../lib/helib_pack/include/helib/sample.h" />
+		<Unit filename="../lib/helib_pack/include/helib/tableLookup.h" />
+		<Unit filename="../lib/helib_pack/include/helib/timing.h" />
+		<Unit filename="../lib/helib_pack/include/helib/zzX.h" />
+		<Unit filename="../lib/pybind11/pybind11/attr.h" />
+		<Unit filename="../lib/pybind11/pybind11/buffer_info.h" />
+		<Unit filename="../lib/pybind11/pybind11/cast.h" />
+		<Unit filename="../lib/pybind11/pybind11/chrono.h" />
+		<Unit filename="../lib/pybind11/pybind11/common.h" />
+		<Unit filename="../lib/pybind11/pybind11/complex.h" />
+		<Unit filename="../lib/pybind11/pybind11/detail/class.h" />
+		<Unit filename="../lib/pybind11/pybind11/detail/common.h" />
+		<Unit filename="../lib/pybind11/pybind11/detail/descr.h" />
+		<Unit filename="../lib/pybind11/pybind11/detail/init.h" />
+		<Unit filename="../lib/pybind11/pybind11/detail/internals.h" />
+		<Unit filename="../lib/pybind11/pybind11/detail/typeid.h" />
+		<Unit filename="../lib/pybind11/pybind11/eigen.h" />
+		<Unit filename="../lib/pybind11/pybind11/embed.h" />
+		<Unit filename="../lib/pybind11/pybind11/eval.h" />
+		<Unit filename="../lib/pybind11/pybind11/functional.h" />
+		<Unit filename="../lib/pybind11/pybind11/iostream.h" />
+		<Unit filename="../lib/pybind11/pybind11/numpy.h" />
+		<Unit filename="../lib/pybind11/pybind11/operators.h" />
+		<Unit filename="../lib/pybind11/pybind11/options.h" />
+		<Unit filename="../lib/pybind11/pybind11/pybind11.h" />
+		<Unit filename="../lib/pybind11/pybind11/pytypes.h" />
+		<Unit filename="../lib/pybind11/pybind11/stl.h" />
+		<Unit filename="../lib/pybind11/pybind11/stl_bind.h" />
+		<Unit filename="../pybind_he/pybind_he.cpp" />
+		<Unit filename="../pybind_he/pybind_he.h" />
+		<Unit filename="../pybind_he/workaround.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -5,7 +5,7 @@
 # 2. PLACED IT UNDER LIB
 # good ;)
 
-
+export CMAKE_VERBOSE_MAKEFILE=TRUE
 export helib_DIR=$(realpath ${PWD}/../lib/helib_pack/share/cmake/helib)
 cd ../examples/
 ./build.sh

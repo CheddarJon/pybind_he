@@ -15,7 +15,7 @@ fi
 
 if [ -e ${helib_DIR} ];
 then
-    cmake ..
+    cmake .. -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 else
     echo "set helib_DIR: export helib_DIR=/path/to/helib_pack/share/cmake/helib";
 fi

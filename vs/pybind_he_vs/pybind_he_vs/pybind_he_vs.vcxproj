@@ -100,7 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\git\pybind_he\submodules\Big_Numbers\Lib\Include\Math;..\..\pthreads;C:\python3\include;..\..\..\lib\pybind11;..\..\..\lib\helib_pack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Python36\include;$(PythonInclude);%(AdditionalIncludeDirectories);C:\git\pybind_he\vs\pthreads;..\..\..\lib\pybind11;..\..\..\lib\helib_pack\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>

@@ -15,6 +15,9 @@ submodules/Pybind
 *build
 *bin
 
+# Ignore all logs
+*log.txt
+
 # Ignore everything under lib
 lib/*
 
