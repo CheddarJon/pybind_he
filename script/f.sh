@@ -23,3 +23,5 @@ g++ ../build/pybind_he.o -o ../build/pybind_he -Wl,-rpath,../lib/helib_pack/lib 
 ../lib/helib_pack/lib/libntl.so \
 ../lib/helib_pack/lib/libgmp.so -lpthread
 
+gdb -nh -batch -x ../gdb/main.gdb ../build/pybind_he
+

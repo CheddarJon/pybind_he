@@ -22,15 +22,32 @@ PYBIND11_MODULE(pybind_he, m)
 	// ----------------
 
 	py::class_<CTX>(m, "Context")
-		// Return a raw pointer:
-		.def(py::init([](unsigned long m, unsigned long p, unsigned long r) { return new CTX(m, p, r);}));
+		.def(py::init([](unsigned long m, unsigned long p, unsigned long r) {
+			return new CTX(m, p, r);
+        }))
+        .def_readwrite("zMStar", &CTX::zMStar)
+        /*.def("printout", [](CTX& ctx) {
+            py::scoped_ostream_redirect stream(
+                std::cout,
+                py::module::import("sys").attr("stdout")
+            );
+            ctx.zMStar.printout();
+        })*/
+        .def_readwrite("ea", &CTX::ea)
+        .def("get_ea", [](CTX& ctx) { return *(ctx.ea); })
+        .def("securityLevel", [](CTX& ctx) {
+            return ctx.securityLevel();
+        });
 }
 #endif
 
 #ifdef BARE_BONE
 #pragma message ( "RUNNING BARE BONE" )
+void Breaker(void) {}
+
 int main(int argc, char *argv[])
 {
     PrintContext();
+	Breaker();
 }
 #endif
