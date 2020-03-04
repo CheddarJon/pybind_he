@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pybind_he
+#import gdb
 
 import unittest
 import os
@@ -22,9 +23,9 @@ class TestHead(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_john(self):
+    def test_PrintContext(self):
 
-        print(pybind_he.john())
+        print(pybind_he.PrintContext())
 
         pass
 
