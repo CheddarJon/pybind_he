@@ -1,7 +1,7 @@
 #include "utils.h"
 
 typedef void (*EVAL_FUNC_PTR)(LweSample*, const LweSample*, const LweSample*, const int,
-		const TFheGateBootstrappingCloudKeySet*);
+		const int, const TFheGateBootstrappingCloudKeySet*);
 
 // elementary full comparator gate that is used to compare the i-th bit:
 //   input: ai and bi the i-th bit of a and b
@@ -26,7 +26,7 @@ equal_bits(LweSample* result, const LweSample* a, const LweSample* b,
 
 // this function compares two multibit words, and puts the max in result
 void minimum(LweSample* result, const LweSample* a, const LweSample* b, const int bits,
-		const TFheGateBootstrappingCloudKeySet* ck)
+		const int scrap, const TFheGateBootstrappingCloudKeySet* ck)
 {
 	LweSample* tmps = new_gate_bootstrapping_ciphertext_array(2, ck->params);
 
@@ -47,17 +47,17 @@ void minimum(LweSample* result, const LweSample* a, const LweSample* b, const in
 
 void
 equal(LweSample* result, const LweSample* a, const LweSample* b, const int bits,
-		const TFheGateBootstrappingCloudKeySet* ck)
+		const int ri, const TFheGateBootstrappingCloudKeySet* ck)
 {
 	/* Returns 1 if a == b
 	 * Returns 0 if a != b
 	 */
 	LweSample* tmp = new_gate_bootstrapping_ciphertext(ck->params);
-	bootsCONSTANT(&result[0], 1, ck);
+	bootsCONSTANT(&result[ri], 1, ck);
 
 	// compare all bits of a and b
 	for (uint8_t i = 0; i < bits; i++)
-		equal_bits(&result[0], &a[i], &b[i], tmp, ck);
+		equal_bits(&result[ri], &a[i], &b[i], tmp, ck);
 
 	delete_gate_bootstrapping_ciphertext(tmp);
 }
@@ -72,28 +72,75 @@ eval(EVAL_FUNC_PTR func, const int bits)
 
 	const TFheGateBootstrappingParameterSet* params = ck->params;
 
-	LweSample* ciphertext1 = new_gate_bootstrapping_ciphertext_array(bits, params);
-	LweSample* ciphertext2 = new_gate_bootstrapping_ciphertext_array(bits, params);
+	LweSample* ciphertext[2];
 	LweSample* result = new_gate_bootstrapping_ciphertext_array(bits, params);
 
-	FILE* data = fopen(CIPHER_FILE, READMODE);
-	for (uint8_t i = 0; i < bits; i++)
-		import_gate_bootstrapping_ciphertext_fromFile(data, &ciphertext1[i], params);
-	for (uint8_t i = 0; i < bits; i++)
-		import_gate_bootstrapping_ciphertext_fromFile(data, &ciphertext2[i], params);
-	fclose(data);
+	for (uint8_t i = 0; i < 2; i++)
+		ciphertext[i] = new_gate_bootstrapping_ciphertext_array(bits, params);
 
-	func(result, ciphertext1, ciphertext2, bits, ck);
+	FILE* data = fopen(CIPHER_FILE, READMODE);
+	for (uint8_t i = 0; i < 2; i++) {
+		for (uint8_t j = 0; j < bits; j++)
+			import_gate_bootstrapping_ciphertext_fromFile(data, &ciphertext[i][j], params);
+	} fclose(data);
+
+	func(result, ciphertext[0], ciphertext[1], bits, 0, ck);
 
 	FILE* output = fopen(DATA_FILE, WRITEMODE);
 	for (uint8_t i = 0; i < bits; i++)
 		export_gate_bootstrapping_ciphertext_toFile(output, &result[i], params);
 	fclose(output);
 
-	delete_gate_bootstrapping_ciphertext_array(bits, ciphertext1);
-	delete_gate_bootstrapping_ciphertext_array(bits, ciphertext2);
+	for (uint8_t i = 0; i < 2; i++)
+		delete_gate_bootstrapping_ciphertext_array(bits, ciphertext[i]);
 	delete_gate_bootstrapping_ciphertext_array(bits, result);
 	delete_gate_bootstrapping_cloud_keyset(ck);
+	return 0;
+}
+
+int
+database_search(EVAL_FUNC_PTR func, const char* search, const char* db, const int db_size, const int bits)
+{
+	FILE* cloud_key = fopen(CLOUDKEY, READMODE);
+	TFheGateBootstrappingCloudKeySet* ck =
+		new_tfheGateBootstrappingCloudKeySet_fromFile(cloud_key);
+	fclose(cloud_key);
+
+	const TFheGateBootstrappingParameterSet* params = ck->params;
+
+	LweSample* db_item[db_size];
+	LweSample* search_term = new_gate_bootstrapping_ciphertext_array(bits, params);
+	LweSample* result = new_gate_bootstrapping_ciphertext_array(db_size, params);
+
+	for (uint8_t i = 0; i < db_size; i++)
+		db_item[i] = new_gate_bootstrapping_ciphertext_array(bits, params);
+
+	FILE* db_file = fopen(db, READMODE);
+	for (uint8_t i = 0; i < db_size; i++) {
+		for (uint8_t j = 0; j < bits; j++) {
+			import_gate_bootstrapping_ciphertext_fromFile(db_file, &db_item[i][j], params);
+		}
+	} fclose(db_file);
+
+	FILE* search_file = fopen(search, READMODE);
+	for (uint8_t i = 0; i < bits; i++)
+		import_gate_bootstrapping_ciphertext_fromFile(search_file, &search_term[i], params);
+	fclose(search_file);
+
+	for (uint8_t i = 0; i < db_size; i++)
+		func(result, search_term, db_item[i], bits, i, ck);
+
+	FILE* output = fopen(DATA_FILE, WRITEMODE);
+	for (uint8_t i = 0; i < db_size; i++)
+		export_gate_bootstrapping_ciphertext_toFile(output, &result[i], params);
+	fclose(output);
+
+	for (uint8_t i = 0; i < db_size; i++)
+		delete_gate_bootstrapping_ciphertext_array(bits, db_item[i]);
+	delete_gate_bootstrapping_ciphertext_array(bits, search_term);
+	delete_gate_bootstrapping_ciphertext_array(db_size, result);
+	delete_gate_bootstrapping_cloud_keyset(ck);
+
 	return 0;
 }
 
@@ -102,5 +149,6 @@ main()
 {
 	EVAL_FUNC_PTR f;
 	f = equal;
-	eval(f, 16);
+	//eval(f, 16);
+	database_search(f, SEARCH, DATABASE, DATABASE_SIZE, 16);
 }

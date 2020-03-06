@@ -39,7 +39,7 @@ generate(const int security_bits, uint8_t export)
 }
 
 int
-encrypt16(int16_t msg, uint8_t export)
+encrypt16(int16_t msg, uint8_t export, const char* outfile)
 {
 	uint8_t bits = 16;
 
@@ -56,7 +56,7 @@ encrypt16(int16_t msg, uint8_t export)
 		bootsSymEncrypt(&ciphertext[i], (msg >> i)&1, key);
 
 	if (export) {
-		FILE* encdata = fopen(CIPHER_FILE, APPENDMODE);
+		FILE* encdata = fopen(outfile, APPENDMODE);
 		for (uint8_t i = 0; i < bits; i++)
 			export_gate_bootstrapping_ciphertext_toFile(encdata, &ciphertext[i], params);
 		fclose(encdata);
@@ -68,9 +68,8 @@ encrypt16(int16_t msg, uint8_t export)
 }
 
 int
-decrypt16()
+decrypt16(const char* infile, const int bits)
 {
-	uint8_t bits = 16;
 	int16_t ret = 0;
 
 	FILE* secret_key = fopen(SECRETKEY, READMODE);
@@ -82,7 +81,7 @@ decrypt16()
 
 	LweSample* msg = new_gate_bootstrapping_ciphertext_array(bits, params);
 
-	FILE* data = fopen(DATA_FILE, READMODE);
+	FILE* data = fopen(infile, READMODE);
 	if (data == NULL) {
 		delete_gate_bootstrapping_secret_keyset(key);
 		delete_gate_bootstrapping_ciphertext_array(bits, msg);
@@ -104,20 +103,28 @@ decrypt16()
 int main(int argc, char **argv)
 {
 	int ret;
-	int16_t data1 = 2017;
-	int16_t data2 = 2017;
+	int16_t search = 2017;
+	int16_t data[DATABASE_SIZE] = {2017, 100, 1000, 2016, 2017};
 
 	if ((ret = generate(110, 1)) == -1)
-	       die("Could not generate secret key set...");
+	       die("Could not generate secret key set...\n");
 
 	if (ret == -2)
-	       die("Could not set parameters...");
+	       die("Could not set parameters...\n");
 
-	encrypt16(data1, 1);
-	encrypt16(data2, 1);
-	ret = decrypt16();
-	if (ret != -1)
-		printf("Result of decryption = %d\n", ret);
+	for (uint8_t i = 0; i < DATABASE_SIZE; i++)
+		encrypt16(data[i], 1, DATABASE);
+	encrypt16(search, 1, SEARCH);
+	ret = decrypt16(DATA_FILE, DATABASE_SIZE);
+	if (ret == -1)
+		return 0;
+
+	for (uint8_t i = 0; i < DATABASE_SIZE; i++) {
+		if ((ret >> i) & 1)
+			printf("Found match: %d = %d\n", search, data[i]);
+		else
+			printf("No match: %d != %d\n", search, data[i]);
+	}
 
 	return 0;
 }

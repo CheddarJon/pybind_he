@@ -1,6 +1,7 @@
 #include <tfhe/tfhe.h>
 #include <tfhe/tfhe_io.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define PARAMS "params.data"
 #define SECRETKEY "secret.key"
@@ -9,10 +10,15 @@
 #define APPENDMODE "ab"
 #define READMODE "rb"
 #define CIPHER_FILE "ciphertext.data"
-#define DATA_FILE "message.data"
+#define DATA_FILE "output.data"
+
+#define DATABASE "database.data"
+#define SEARCH "searchterm.data"
+
+#define DATABASE_SIZE 5
 
 int die(const char* msg)
 {
 	fprintf(stderr, msg);
-	return -1;
+	exit(-1);
 }
