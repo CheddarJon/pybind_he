@@ -1,19 +1,4 @@
-#include <tfhe/tfhe.h>
-#include <tfhe/tfhe_io.h>
-#include <stdio.h>
-
-#define PARAMS "params.data"
-#define SECRETKEY "secret.key"
-#define CLOUDKEY "cloud.key"
-#define WRITEMODE "wb"
-#define READMODE "rb"
-#define CIPHER_FILE "ciphertext.data"
-
-int die(const char* msg)
-{
-	fprintf(stderr, msg);
-	return -1;
-}
+#include "utils.h"
 
 int
 generate(const int security_bits, uint8_t export)
@@ -97,7 +82,12 @@ decrypt16()
 
 	LweSample* msg = new_gate_bootstrapping_ciphertext_array(bits, params);
 
-	FILE* data = fopen(CIPHER_FILE, READMODE);
+	FILE* data = fopen(DATA_FILE, READMODE);
+	if (data == NULL) {
+		delete_gate_bootstrapping_secret_keyset(key);
+		delete_gate_bootstrapping_ciphertext_array(bits, msg);
+		return -1;
+	}
 	for (uint8_t i = 0; i < bits; i++)
 		import_gate_bootstrapping_ciphertext_fromFile(data, &msg[i], params);
 
