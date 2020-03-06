@@ -41,7 +41,7 @@ generate(const int security_bits, uint8_t export)
 int
 encrypt16(int16_t msg, uint8_t export, const char* outfile)
 {
-	uint8_t bits = 16;
+	uint32_t bits = 16;
 
 	FILE* secret_key = fopen(SECRETKEY, READMODE);
 	TFheGateBootstrappingSecretKeySet* key =
@@ -52,12 +52,12 @@ encrypt16(int16_t msg, uint8_t export, const char* outfile)
 
 	LweSample* ciphertext = new_gate_bootstrapping_ciphertext_array(16, params);
 
-	for (uint8_t i = 0; i < bits; i++)
+	for (uint32_t i = 0; i < bits; i++)
 		bootsSymEncrypt(&ciphertext[i], (msg >> i)&1, key);
 
 	if (export) {
 		FILE* encdata = fopen(outfile, APPENDMODE);
-		for (uint8_t i = 0; i < bits; i++)
+		for (uint32_t i = 0; i < bits; i++)
 			export_gate_bootstrapping_ciphertext_toFile(encdata, &ciphertext[i], params);
 		fclose(encdata);
 	}
@@ -67,10 +67,10 @@ encrypt16(int16_t msg, uint8_t export, const char* outfile)
 	return 0;
 }
 
-int
-decrypt16(const char* infile, const int bits)
+int32_t
+decrypt32(const char* infile, const int bits)
 {
-	int16_t ret = 0;
+	uint32_t ret = 0;
 
 	FILE* secret_key = fopen(SECRETKEY, READMODE);
 	TFheGateBootstrappingSecretKeySet* key =
@@ -87,10 +87,10 @@ decrypt16(const char* infile, const int bits)
 		delete_gate_bootstrapping_ciphertext_array(bits, msg);
 		return -1;
 	}
-	for (uint8_t i = 0; i < bits; i++)
+	for (uint32_t i = 0; i < bits; i++)
 		import_gate_bootstrapping_ciphertext_fromFile(data, &msg[i], params);
 
-	for (uint8_t i = 0; i < bits; i++) {
+	for (uint32_t i = 0; i < bits; i++) {
 		int tmp = bootsSymDecrypt(&msg[i], key);
 		ret |= (tmp << i);
 	}
@@ -102,9 +102,16 @@ decrypt16(const char* infile, const int bits)
 
 int main(int argc, char **argv)
 {
-	int ret;
+	int32_t ret;
 	int16_t search = 2017;
-	int16_t data[DATABASE_SIZE] = {2017, 100, 1000, 2016, 2017};
+	int16_t data[DATABASE_SIZE];
+
+	for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
+		if ((i % 13) == 0)
+			data[i] = search;
+		else
+			data[i] = rand() % 65536;
+	}
 
 	if ((ret = generate(110, 1)) == -1)
 	       die("Could not generate secret key set...\n");
@@ -112,14 +119,15 @@ int main(int argc, char **argv)
 	if (ret == -2)
 	       die("Could not set parameters...\n");
 
-	for (uint8_t i = 0; i < DATABASE_SIZE; i++)
+	for (uint32_t i = 0; i < DATABASE_SIZE; i++)
 		encrypt16(data[i], 1, DATABASE);
 	encrypt16(search, 1, SEARCH);
-	ret = decrypt16(DATA_FILE, DATABASE_SIZE);
+	ret = decrypt32(DATA_FILE, DATABASE_SIZE);
 	if (ret == -1)
 		return 0;
 
-	for (uint8_t i = 0; i < DATABASE_SIZE; i++) {
+	printf("Result = %d\n", ret);
+	for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
 		if ((ret >> i) & 1)
 			printf("Found match: %d = %d\n", search, data[i]);
 		else

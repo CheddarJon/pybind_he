@@ -15,7 +15,7 @@
 #define DATABASE "database.data"
 #define SEARCH "searchterm.data"
 
-#define DATABASE_SIZE 5
+#define DATABASE_SIZE 20
 
 int die(const char* msg)
 {
