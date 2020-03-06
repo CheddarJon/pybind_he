@@ -56,7 +56,7 @@ encrypt16(int16_t msg, uint8_t export)
 		bootsSymEncrypt(&ciphertext[i], (msg >> i)&1, key);
 
 	if (export) {
-		FILE* encdata = fopen(CIPHER_FILE, WRITEMODE);
+		FILE* encdata = fopen(CIPHER_FILE, APPENDMODE);
 		for (uint8_t i = 0; i < bits; i++)
 			export_gate_bootstrapping_ciphertext_toFile(encdata, &ciphertext[i], params);
 		fclose(encdata);
@@ -104,7 +104,8 @@ decrypt16()
 int main(int argc, char **argv)
 {
 	int ret;
-	int16_t data = 2017;
+	int16_t data1 = 2017;
+	int16_t data2 = 2017;
 
 	if ((ret = generate(110, 1)) == -1)
 	       die("Could not generate secret key set...");
@@ -112,9 +113,11 @@ int main(int argc, char **argv)
 	if (ret == -2)
 	       die("Could not set parameters...");
 
-	encrypt16(data, 1);
+	encrypt16(data1, 1);
+	encrypt16(data2, 1);
 	ret = decrypt16();
-	printf("Result of decryption = %d\n", ret);
+	if (ret != -1)
+		printf("Result of decryption = %d\n", ret);
 
 	return 0;
 }

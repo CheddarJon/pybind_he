@@ -6,6 +6,7 @@
 #define SECRETKEY "secret.key"
 #define CLOUDKEY "cloud.key"
 #define WRITEMODE "wb"
+#define APPENDMODE "ab"
 #define READMODE "rb"
 #define CIPHER_FILE "ciphertext.data"
 #define DATA_FILE "message.data"
