@@ -3,6 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sys/socket.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+
 #define PARAMS "params.data"
 #define SECRETKEY "secret.key"
 #define CLOUDKEY "cloud.key"
@@ -17,8 +25,12 @@
 
 #define DATABASE_SIZE 20
 
+#define PORT 6667
+#define NUM_CLIENTS 1
+
 int die(const char* msg)
 {
 	fprintf(stderr, msg);
 	exit(-1);
 }
+

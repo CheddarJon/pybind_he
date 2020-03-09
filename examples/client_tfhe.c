@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <string.h>
 
 int
 generate(const int security_bits, uint8_t export)
@@ -39,7 +40,7 @@ generate(const int security_bits, uint8_t export)
 }
 
 int
-encrypt16(int16_t msg, uint8_t export, const char* outfile)
+encrypt16(int16_t msg, uint8_t export, const char* outfile, const char* mode)
 {
 	uint32_t bits = 16;
 
@@ -56,7 +57,7 @@ encrypt16(int16_t msg, uint8_t export, const char* outfile)
 		bootsSymEncrypt(&ciphertext[i], (msg >> i)&1, key);
 
 	if (export) {
-		FILE* encdata = fopen(outfile, APPENDMODE);
+		FILE* encdata = fopen(outfile, mode);
 		for (uint32_t i = 0; i < bits; i++)
 			export_gate_bootstrapping_ciphertext_toFile(encdata, &ciphertext[i], params);
 		fclose(encdata);
@@ -100,18 +101,44 @@ decrypt32(const char* infile, const int bits)
 	return ret;
 }
 
-int main(int argc, char **argv)
+void
+initdb(int16_t* data)
 {
-	int32_t ret;
-	int16_t search = 2017;
-	int16_t data[DATABASE_SIZE];
 
 	for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
-		if ((i % 13) == 0)
-			data[i] = search;
-		else
-			data[i] = rand() % 65536;
+		data[i] = rand() % 65536;
 	}
+}
+
+int
+cmdToServer(const char* cmd)
+{
+	int sid, conn, c;
+	struct sockaddr_in server, client;
+	char send_buffer[1024];
+
+	if ((sid = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		die("Socket creation\n");
+
+	server.sin_family = AF_INET;
+	server.sin_port = htons(PORT);
+	server.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	if (connect(sid, (struct sockaddr *) &server, sizeof(struct sockaddr_in)))
+		die("Connecting to server\n");
+
+	send(sid, cmd, sizeof(cmd), 0);
+	return 0;
+}
+
+int
+main(int argc, char **argv)
+{
+	int32_t ret = -1;
+	char buffer[2];
+	int16_t search = 2017;
+	int16_t data[DATABASE_SIZE];
+	initdb(data);
 
 	if ((ret = generate(110, 1)) == -1)
 	       die("Could not generate secret key set...\n");
@@ -119,19 +146,63 @@ int main(int argc, char **argv)
 	if (ret == -2)
 	       die("Could not set parameters...\n");
 
-	for (uint32_t i = 0; i < DATABASE_SIZE; i++)
-		encrypt16(data[i], 1, DATABASE);
-	encrypt16(search, 1, SEARCH);
-	ret = decrypt32(DATA_FILE, DATABASE_SIZE);
-	if (ret == -1)
-		return 0;
+	printf("Input command (type h for help): ");
+	while (1) {
+		printf(">");
+		if ((fgets(buffer, 2, stdin)) == NULL)
+			die("Reding stdin...\n");
+		buffer[2] = '\0';
 
-	printf("Result = %d\n", ret);
-	for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
-		if ((ret >> i) & 1)
-			printf("Found match: %d = %d\n", search, data[i]);
-		else
-			printf("No match: %d != %d\n", search, data[i]);
+		if (strcmp(buffer, "h") == 0)
+			printf("Commands: h (help), q (quit), e (encrypt db and search), c (get server to compute), d (decrypt result), p (print result), s (show values), u (update search term)\n");
+
+		if (strcmp(buffer, "q") == 0) {
+			printf("You chose this...\n");
+			break;
+		}
+
+		if (strcmp(buffer, "e") == 0) {
+			for (uint32_t i = 0; i < DATABASE_SIZE; i++)
+				encrypt16(data[i], 1, DATABASE, APPENDMODE);
+			encrypt16(search, 1, SEARCH, WRITEMODE);
+		}
+
+		if (strcmp(buffer, "d") == 0) {
+			ret = decrypt32(DATA_FILE, DATABASE_SIZE);
+				if (ret == -1)
+					printf("Decryption failed...\n");
+		}
+
+		if (strcmp(buffer, "s") == 0) {
+			printf("db: [");
+			for (uint32_t i = 0; i < DATABASE_SIZE; i++)
+				printf("%d ", data[i]);
+			printf("]\nsearch term: %d\n", search);
+		}
+
+		if (strcmp(buffer, "c") == 0) {
+			cmdToServer("e");
+		}
+
+		if (strcmp(buffer, "u") == 0) {
+			printf("Input new search term: ");
+			scanf("%d", &search);
+		}
+
+		if (strcmp(buffer, "p") == 0) {
+			if (ret == -1) {
+				printf("Decrypt before print...\n");
+			}
+			else{
+				printf("Result = %d\n", ret);
+				for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
+					if ((ret >> i) & 1)
+						printf("Found match: %d = %d\n", search, data[i]);
+					else
+						printf("No match: %d != %d\n", search, data[i]);
+				}
+			}
+		}
 	}
 
 	return 0;

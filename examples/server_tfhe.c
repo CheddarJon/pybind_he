@@ -149,10 +149,60 @@ database_search(EVAL_FUNC_PTR func, const char* search, const char* db, const in
 }
 
 int
+server_handler(int id, struct sockaddr_in client)
+{
+	char recv_buffer[1024];
+	EVAL_FUNC_PTR f;
+
+	recv(id, recv_buffer, sizeof(recv_buffer), 0);
+	close(id);
+
+	if (strcmp(recv_buffer, "e") == 0) {
+		f = equal;
+	}
+
+	printf("Starting homomorphic operations...\n");
+	database_search(f, SEARCH, DATABASE, DATABASE_SIZE, 16);
+	return 0;
+}
+
+int
+server()
+{
+	/* init. */
+	int sid, conn, c;
+	struct sockaddr_in server, client;
+
+	if ((sid = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		die("Socket creation");
+
+	server.sin_family = AF_INET;
+	server.sin_port = htons(PORT);
+	server.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	if (bind(sid, (struct sockaddr *) &server, sizeof(server)))
+		die("Binding socket");
+
+	if (listen(sid, NUM_CLIENTS))
+		die("Listening on port");
+
+	c = sizeof(struct sockaddr_in);
+
+	while (1) {
+		printf("Waiting...\n");
+		conn = accept(sid, (struct sockaddr *) &client, (socklen_t*) &c);
+		if (conn == -1)
+			die("Accepting new connection.");
+		printf("Accepted connection...\n");
+
+		/* Deal with new connection, implement fork(). */
+		server_handler(conn, client);
+	}
+	return 0;
+}
+
+int
 main()
 {
-	EVAL_FUNC_PTR f;
-	f = equal;
-	//eval(f, 16);
-	database_search(f, SEARCH, DATABASE, DATABASE_SIZE, 16);
+	server();
 }
