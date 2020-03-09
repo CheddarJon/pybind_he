@@ -4,3 +4,6 @@
 [submodule "submodules/Pybind"]
 	path = submodules/Pybind
 	url = https://github.com/pybind/pybind11.git
+[submodule "submodule/tfhe"]
+	path = submodule/tfhe
+	url = https://github.com/tfhe/tfhe.git
