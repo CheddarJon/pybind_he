@@ -21,10 +21,6 @@ generate(const int security_bits, uint8_t export)
 		return -1;
 
 	if (export) {
-		FILE* parameters = fopen(PARAMS, WRITEMODE);
-		export_tfheGateBootstrappingParameterSet_toFile(parameters, params);
-		fclose(parameters);
-
 		FILE* secret_key = fopen(SECRETKEY, WRITEMODE);
 		export_tfheGateBootstrappingSecretKeySet_toFile(secret_key, key);
 		fclose(secret_key);
@@ -163,12 +159,12 @@ main(int argc, char **argv)
 
 		if (strcmp(buffer, "e") == 0) {
 			for (uint32_t i = 0; i < DATABASE_SIZE; i++)
-				encrypt16(data[i], 1, DATABASE, APPENDMODE);
-			encrypt16(search, 1, SEARCH, WRITEMODE);
+				encrypt16(data[i], 1, ENC_DB, APPENDMODE);
+			encrypt16(search, 1, ENC_INPUT, WRITEMODE);
 		}
 
 		if (strcmp(buffer, "d") == 0) {
-			ret = decrypt32(DATA_FILE, DATABASE_SIZE);
+			ret = decrypt32(HE_RESULT, DATABASE_SIZE);
 				if (ret == -1)
 					printf("Decryption failed...\n");
 		}
@@ -194,12 +190,14 @@ main(int argc, char **argv)
 				printf("Decrypt before print...\n");
 			}
 			else{
-				printf("Result = %d\n", ret);
-				for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
-					if ((ret >> i) & 1)
-						printf("Found match: %d = %d\n", search, data[i]);
-					else
-						printf("No match: %d != %d\n", search, data[i]);
+				if (!ret) {
+					printf("Found no matches for %d", search);
+				}
+				else {
+					for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
+						if ((ret >> i) & 1)
+							printf("Found match for %d at index %d\n", search, i);
+					}
 				}
 			}
 		}

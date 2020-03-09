@@ -78,7 +78,7 @@ eval(EVAL_FUNC_PTR func, const int bits)
 	for (uint32_t i = 0; i < 2; i++)
 		ciphertext[i] = new_gate_bootstrapping_ciphertext_array(bits, params);
 
-	FILE* data = fopen(CIPHER_FILE, READMODE);
+	FILE* data = fopen(ENC_INPUT, READMODE);
 	for (uint32_t i = 0; i < 2; i++) {
 		for (uint32_t j = 0; j < bits; j++)
 			import_gate_bootstrapping_ciphertext_fromFile(data, &ciphertext[i][j], params);
@@ -86,7 +86,7 @@ eval(EVAL_FUNC_PTR func, const int bits)
 
 	func(result, ciphertext[0], ciphertext[1], bits, 0, ck);
 
-	FILE* output = fopen(DATA_FILE, WRITEMODE);
+	FILE* output = fopen(HE_RESULT, WRITEMODE);
 	for (uint32_t i = 0; i < bits; i++)
 		export_gate_bootstrapping_ciphertext_toFile(output, &result[i], params);
 	fclose(output);
@@ -133,7 +133,7 @@ database_search(EVAL_FUNC_PTR func, const char* search, const char* db, const in
 		func(result, search_term, db_item[i], bits, i, ck);
 
 	// WRITING OUTPUT TO FILE
-	FILE* output = fopen(DATA_FILE, WRITEMODE);
+	FILE* output = fopen(HE_RESULT, WRITEMODE);
 	for (uint32_t i = 0; i < db_size; i++)
 		export_gate_bootstrapping_ciphertext_toFile(output, &result[i], params);
 	fclose(output);
@@ -162,7 +162,7 @@ server_handler(int id, struct sockaddr_in client)
 	}
 
 	printf("Starting homomorphic operations...\n");
-	database_search(f, SEARCH, DATABASE, DATABASE_SIZE, 16);
+	database_search(f, ENC_INPUT, ENC_DB, DATABASE_SIZE, 16);
 	return 0;
 }
 

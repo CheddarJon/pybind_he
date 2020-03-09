@@ -11,17 +11,14 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 
-#define PARAMS "params.data"
 #define SECRETKEY "secret.key"
 #define CLOUDKEY "cloud.key"
 #define WRITEMODE "wb"
 #define APPENDMODE "ab"
 #define READMODE "rb"
-#define CIPHER_FILE "ciphertext.data"
-#define DATA_FILE "output.data"
-
-#define DATABASE "database.data"
-#define SEARCH "searchterm.data"
+#define ENC_DB "encdb.data"
+#define HE_RESULT "result.data"
+#define ENC_INPUT "encserverinput.data"
 
 #define DATABASE_SIZE 20
 
