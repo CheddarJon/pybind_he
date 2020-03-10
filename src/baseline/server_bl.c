@@ -1,173 +1,86 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "bl_crypto.h"
 
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
-#include <openssl/rsa.h>
-#include <openssl/rand.h>
+#define DB_SIZE 5
 
-#define RSA_KEYLEN 2048
-#define AES_ROUNDS 6
-#define AES_KEYLEN 256
-#define AES_IVLEN 256
-
-EVP_PKEY *rsaKey;
+static EVP_PKEY *server_pk;
 
 unsigned char *aesKey;
 unsigned char *aesIV;
 int aeskeylen;
 
-void
-die(char *msg)
+int
+database_search(unsigned char *search, unsigned char *db, const int size)
 {
-	perror(msg);
-	exit(-1);
+	int ret, i;
+	db[size] = '\0';
+	unsigned char *tdb = db;
+	unsigned char *ts = search;
+
+	ret = 0;
+	i = 0;
+
+	if (db == NULL)
+		die("db null in database_search...\n");
+
+	while (*tdb != '\0') {
+		if (*tdb == *ts) {
+			tdb++;
+			ts++;
+		}
+
+		if (*ts == '\0' && (*tdb == '\0' || *tdb == '\n')) {
+			ret |= (1 << i++);
+			tdb++;
+			ts = search;
+		}
+		if (*ts != *tdb) {
+			while (*tdb != '\n') {
+				if (*++tdb == '\0')
+					break;
+			} tdb++;
+			i++;
+			ts = search;
+		}
+	}
+	return ret;
 }
 
 int
-envelope_seal(EVP_PKEY **pk, unsigned char *plaintext, int plaintext_len,
-		unsigned char **ek, int *ekl, unsigned char *iv,
-		unsigned char *ciphertext)
+db_search_wrapper()
 {
-	EVP_CIPHER_CTX *ctx;
+	unsigned char *mock_db = "Hej\nHallå\nTjena\nTja\nTjenixen\nGoddag\nTjena";
+	unsigned char *enc_db;
+	unsigned char *ret_db;
+	int mock_db_len = strlen(mock_db) + 1;
+	int enc_db_len;
 
-	int ciphertext_len;
+	setup(&server_pk, &aesKey, &aesIV);
+	enc_db = (unsigned char *)malloc(sizeof(unsigned char) * (size_t) (mock_db_len * 4));
+	ret_db = (unsigned char *)malloc(sizeof(unsigned char) * (size_t) mock_db_len);
 
-	int len;
+	// Encrypt
+	enc_db_len = envelope_seal(&server_pk, mock_db, mock_db_len,
+			&aesKey, &aeskeylen, aesIV, enc_db);
 
-	if (!(ctx = EVP_CIPHER_CTX_new()))
-		die("Generating new context in evelope_seal...\n");
+	// Wait for client to select op.
+	// Decrypt db and compute.
+	envelope_open(server_pk, enc_db, enc_db_len, aesKey, aeskeylen, aesIV, ret_db);
 
-	if( 1 != EVP_SealInit(ctx, EVP_aes_256_cbc(), ek, ekl, iv, pk, 1))
-		die("SealInit...\n");
+	int tmp = database_search("Tjena", ret_db, mock_db_len);
+	printf("Return: %d\n", tmp);
 
-	if (1 != EVP_SealUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
-		die("SealUpdate...\n");
-	ciphertext_len = len;
+	envelope_seal(&server_pk, ret_db, mock_db_len,
+			&aesKey, &aeskeylen, aesIV, enc_db);
 
-	if (1 != EVP_SealFinal(ctx, ciphertext + len, &len))
-		die("SealFinal...\n");
-	ciphertext_len += len;
-
-	EVP_CIPHER_CTX_free(ctx);
-
-	return ciphertext_len;
-}
-
-int
-envelope_open(EVP_PKEY *sk, unsigned char *ciphertext, int ciphertext_len,
-		unsigned char *ek, int ekl, unsigned char *iv,
-		unsigned char *plaintext)
-{
-	EVP_CIPHER_CTX *ctx;
-
-	int len;
-
-	int plaintext_len;
-
-	if (!(ctx = EVP_CIPHER_CTX_new()))
-		die("Generating new context in envelope_open...\n");
-
-	if (1 != EVP_OpenInit(ctx, EVP_aes_256_cbc(), ek, ekl, iv, sk))
-		die("OpenInit...\n");
-
-	if (1 != EVP_OpenUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
-		die("OpenUpdate...\n");
-	plaintext_len = len;
-
-	if (1 != EVP_OpenFinal(ctx, plaintext + len, &len))
-		die("OpenFinal...\n");
-	plaintext_len += len;
-
-	EVP_CIPHER_CTX_free(ctx);
-
-	return plaintext_len;
-}
-
-int
-genRSAkeypair(EVP_PKEY **keypair)
-{
-	EVP_PKEY_CTX *ctx;
-
-	if (!(ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL)))
-		die("genRSAkeypair...\n");
-
-
-	if (EVP_PKEY_keygen_init(ctx) <= 0)
-		die("RSA keygen init...\n");
-
-	if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, RSA_KEYLEN) <= 0)
-		die("RSA keygen bits...\n");
-
-	if (EVP_PKEY_keygen(ctx, keypair) <= 0)
-		die("RSA keygen...\n");
-
-	EVP_PKEY_CTX_free(ctx);
+	teardown(aesKey, aesIV);
+	free(enc_db);
+	free(ret_db);
 	return 0;
-}
-
-int
-genAESkey(unsigned char **key, unsigned char **iv)
-{
-	if (RAND_bytes(*key, AES_KEYLEN) == 0)
-		die("Failure to fill aes key with random bytes...\n");
-
-	if (RAND_bytes(*iv, AES_IVLEN) == 0)
-		die("Failure to fill aes IV with random bytes...\n");
 }
 
 int
 main(int argc, char *argv[])
 {
-	unsigned char *pt = "Du är en fjomp!";
-	int ptl = strlen(pt);
-	unsigned char *ct =
-		(unsigned char *)malloc((size_t) (sizeof(unsigned char) * (size_t) (4 * ptl)));
-	int ctl = 0;
-	unsigned char *rpt=
-		(unsigned char *)malloc((size_t) (sizeof(unsigned char) * (size_t) (4 * ptl + 1)));
-	int rptl;
-
-	aesKey = (unsigned char *)malloc(AES_KEYLEN);
-	aesIV = (unsigned char *)malloc(AES_IVLEN);
-
-	if (ct == NULL || rpt == NULL || aesKey == NULL || aesIV == NULL)
-		die("malloc in main...\n");
-
-	// OpenSSL init
-	ERR_load_crypto_strings();
-	OpenSSL_add_all_algorithms();
-	OPENSSL_config(NULL);
-
-	// Generate keys
-	genRSAkeypair(&rsaKey);
-
-	if (rsaKey == NULL)
-		die("Failed to set rsa key...\n");
-
-	genAESkey(&aesKey, &aesIV);
-
-	if (aesKey == NULL || aesIV == NULL)
-		die("Failed to set aeskey and IV...\n");
-
-	// Enc Dec
-	ctl = envelope_seal(&rsaKey, pt, ptl, &aesKey, &aeskeylen, aesIV, ct);
-
-	rptl = envelope_open(rsaKey, ct, ctl, aesKey, aeskeylen, aesIV, rpt);
-
-	printf("Encrypted %s\n", pt);
-	printf("Decrypted %s\n", rpt);
-
-
-	// CLEANUP
-	free(ct);
-	free(rpt);
-	free(aesKey);
-	free(aesIV);
-	EVP_cleanup();
-	CRYPTO_cleanup_all_ex_data();
-	ERR_free_strings();
+	db_search_wrapper();
 	return 0;
 }
