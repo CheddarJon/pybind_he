@@ -22,4 +22,8 @@ Copy .so file from build directory into lib/
 
 ### Visual Studio
 
-[Visual Studio](vs/VS.md) 
+[Visual Studio](vs/VS.md)
+
+### Install TFHE globally as root (optional)
+
+[Install Script](script/tfhe_local_computer_install.sh)
