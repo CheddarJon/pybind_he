@@ -3,6 +3,36 @@
 
 static int numargs=0;
 
+struct MockLweStruct {
+	int32_t a;
+	int32_t b;
+	double c;
+};
+
+typedef struct MockLweStruct MockLweStruct;
+
+static MockLweStruct lweParams[] = {
+	{.a = 1, .b = 1, .c = 1.0},
+	{.a = 2, .b = 2, .c = 2.0},
+	{.a = 3, .b = 3, .c = 3.0}
+};
+
+static PyObject*
+emb_getarg(PyObject *self, PyObject *args)
+{
+	int arg;
+	if (!PyArg_ParseTuple(args, "i:getarg", &arg))
+		return NULL;
+
+	if (arg >= 0 && arg < 3) {
+		MockLweStruct tmp = lweParams[arg];
+		return Py_BuildValue("iid", tmp.a, tmp.b, tmp.c);
+	}
+	else {
+		return NULL;
+	}
+}
+
 /* Return the number of arguments of the application command line */
 static PyObject*
 emb_numargs(PyObject *self, PyObject *args)
@@ -15,6 +45,8 @@ emb_numargs(PyObject *self, PyObject *args)
 static PyMethodDef EmbMethods[] = {
 	{"numargs", emb_numargs, METH_VARARGS,
 	 "Return the number of arguments received by the process."},
+	{"getarg", emb_getarg, METH_VARARGS,
+	 "Return the integer passed as argument."},
 	{NULL, NULL, 0, NULL}
 };
 
