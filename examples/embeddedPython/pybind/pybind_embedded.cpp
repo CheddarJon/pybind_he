@@ -9,7 +9,7 @@ MockFFT(int a, int b)
 {
     char *overlay;
     // It should be set to the name of the python script (no extension)
-    // The script needs to be located in the current directory.
+    // The script needs to be located in the current directory or in PYTHONPATH
     overlay = getenv("PYTHON_OVERLAY");
 
     if (overlay != NULL) {
