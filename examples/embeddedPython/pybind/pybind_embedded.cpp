@@ -20,9 +20,11 @@ MockFFT(int a, int b)
         py::object result = fft.attr("execute")(a, b);
         int n = result.cast<int>();
         assert(n == 8);
+        std::cout << a << " * " << b << " = " << n << std::endl;
     } else {
         // Run c++ version
         std::cout << "Running fft implemented in c++" << std::endl;
+        std::cout << a << " * " << b << " = " << a*b << std::endl;
     }
 }
 
