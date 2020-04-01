@@ -129,12 +129,14 @@ database_search(EVAL_FUNC_PTR func, const char* search, const char* db, const in
 	fclose(search_file);
 
 	// HOMOMORPHIC OPERATION
-	for (uint32_t i = 0; i < db_size; i++)
+	for (uint32_t i = 0; i < DATABASE_SIZE; i++) {
+		printf("Checking db entry %d\n", i);
 		func(result, search_term, db_item[i], bits, i, ck);
+	}
 
 	// WRITING OUTPUT TO FILE
 	FILE* output = fopen(HE_RESULT, WRITEMODE);
-	for (uint32_t i = 0; i < db_size; i++)
+	for (uint32_t i = 0; i < DATABASE_SIZE; i++)
 		export_gate_bootstrapping_ciphertext_toFile(output, &result[i], params);
 	fclose(output);
 

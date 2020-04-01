@@ -20,6 +20,8 @@
 #define HE_RESULT "result.data"
 #define ENC_INPUT "encserverinput.data"
 
+#define LOG_FILE "tfhe.log"
+
 #define DATABASE_SIZE 20
 
 #define PORT 6667
