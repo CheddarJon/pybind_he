@@ -54,9 +54,8 @@ encrypt16(int16_t msg, uint8_t export, const char* outfile, const char* mode)
 
 	if (export) {
 		FILE* encdata = fopen(outfile, mode);
-		for (uint32_t i = 0; i < bits; i++) {
+		for (uint32_t i = 0; i < bits; i++)
 			export_gate_bootstrapping_ciphertext_toFile(encdata, &ciphertext[i], params);
-		}
 		fclose(encdata);
 	}
 
@@ -142,7 +141,7 @@ main(int argc, char **argv)
 
 	if (ret == -2)
 	       die("Could not set parameters...\n");
-	ret = -1;
+
 	printf("Input command (type h for help): ");
 	while (1) {
 		printf(">");
@@ -160,7 +159,7 @@ main(int argc, char **argv)
 
 		if (strcmp(buffer, "e") == 0) {
 			for (uint32_t i = 0; i < DATABASE_SIZE; i++)
-				encrypt16(data[i], DATABASE_SIZE, ENC_DB, APPENDMODE);
+				encrypt16(data[i], 1, ENC_DB, APPENDMODE);
 			encrypt16(search, 1, ENC_INPUT, WRITEMODE);
 		}
 
